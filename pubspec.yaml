@@ -1,0 +1,68 @@
+name: soulpet
+description: "SoulPet — AI Virtual Pet Companion App"
+publish_to: 'none'
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
+
+  # Navigation
+  go_router: ^14.2.7
+
+  # Local storage
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.2
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+
+  # Network
+  dio: ^5.7.0
+  retrofit: ^4.4.1
+
+  # Form validation
+  formz: ^0.7.0
+
+  # Functional programming
+  dartz: ^0.10.1
+
+  # Utilities
+  intl: ^0.19.0
+  uuid: ^4.5.1
+  logger: ^2.4.0
+  get_it: ^8.0.2
+  injectable: ^2.5.0
+
+  # UI
+  lottie: ^3.1.2
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+  flutter_animate: ^4.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.12
+  injectable_generator: ^2.7.0
+  retrofit_generator: ^9.1.4
+  json_serializable: ^6.8.0
+  json_annotation: ^4.9.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/animations/
+    - assets/data/
