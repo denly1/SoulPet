@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -17,7 +18,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  static const _icons = [Icons.pets_rounded, Icons.wb_sunny_rounded, Icons.auto_awesome_rounded];
+  static const _icons = [
+    Icons.spa_outlined,
+    Icons.wb_twilight_rounded,
+    Icons.auto_awesome_outlined,
+  ];
   static const _titles = [
     AppStrings.onboardingTitle1,
     AppStrings.onboardingTitle2,
@@ -70,7 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: Text(
                             'Пропустить',
                             style: TextStyle(
-                              color: AppColors.textSecondary.withValues(alpha: 0.7),
+                              color: AppColors.textSecondary,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -91,37 +96,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Glass container with icon
-                          Container(
-                            width: 150,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(40),
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.white.withValues(alpha: 0.65),
-                                  Colors.white.withValues(alpha: 0.25),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.5),
-                                width: 1.5,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.secondary.withValues(alpha: 0.15),
-                                  blurRadius: 30,
-                                  spreadRadius: 5,
+                          // Glass circle with icon
+                          ClipOval(
+                            child: BackdropFilter(
+                              filter:
+                                  ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: Container(
+                                width: 150,
+                                height: 150,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: AppColors.glassGradient,
+                                  border: Border.all(
+                                    color: AppColors.glassBorder,
+                                    width: 1.5,
+                                  ),
+                                  boxShadow: AppColors.glassShadow,
                                 ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Icon(
-                                _icons[index],
-                                size: 68,
-                                color: AppColors.secondary,
+                                child: Center(
+                                  child: Icon(
+                                    _icons[index],
+                                    size: 68,
+                                    color: AppColors.deepMoss,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -129,10 +127,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           Text(
                             _titles[index],
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 26,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -140,7 +138,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             _descs[index],
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: AppColors.textSecondary.withValues(alpha: 0.85),
+                              color: AppColors.textSecondary,
                               fontSize: 15,
                               height: 1.6,
                             ),
@@ -168,8 +166,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           height: 8,
                           decoration: BoxDecoration(
                             color: i == _currentPage
-                                ? AppColors.secondary
-                                : AppColors.secondary.withValues(alpha: 0.25),
+                                ? AppColors.deepMoss
+                                : AppColors.mistBorder,
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -185,10 +183,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           _currentPage == 2
                               ? AppStrings.getStarted
                               : AppStrings.next,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
                         ),
                       ),
                     ),

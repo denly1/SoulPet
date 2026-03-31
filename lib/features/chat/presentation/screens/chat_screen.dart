@@ -7,32 +7,25 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('AI Чат')),
+      appBar: AppBar(title: Text('AI Чат', style: const TextStyle())),
       body: Container(
         decoration: const BoxDecoration(gradient: AppColors.warmGradient),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.chat_bubble_rounded,
-                  size: 64, color: AppColors.secondary.withValues(alpha: 0.4)),
+              Icon(Icons.forum_outlined,
+                  size: 64, color: AppColors.deepMoss.withValues(alpha: 0.4)),
               const SizedBox(height: 16),
-              const Text(
-                'AI Чат',
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              Text('AI Чат',
+                  style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
-              Text(
-                'Скоро',
-                style: TextStyle(
-                  color: AppColors.textSecondary.withValues(alpha: 0.7),
-                  fontSize: 14,
-                ),
-              ),
+              Text('Скоро',
+                  style: TextStyle(
+                      color: AppColors.textSecondary, fontSize: 14)),
             ],
           ),
         ),

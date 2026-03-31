@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -62,44 +63,35 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 48),
-                  // Logo
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(28),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white.withValues(alpha: 0.7),
-                          Colors.white.withValues(alpha: 0.3),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        width: 1.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.secondary.withValues(alpha: 0.2),
-                          blurRadius: 24,
-                          spreadRadius: 4,
+                  // Glass logo
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(28),
+                          gradient: AppColors.glassGradient,
+                          border: Border.all(
+                              color: AppColors.glassBorder, width: 1.5),
+                          boxShadow: AppColors.glassShadow,
                         ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(Icons.pets_rounded,
-                          size: 48, color: AppColors.secondary),
+                        child: Center(
+                          child: Icon(Icons.spa_rounded,
+                              size: 48, color: AppColors.deepMoss),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'Soulpet',
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 30,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       letterSpacing: 1,
                     ),
                   ),
@@ -107,106 +99,107 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     'Добро пожаловать',
                     style: TextStyle(
-                      color: AppColors.textSecondary.withValues(alpha: 0.8),
+                      color: AppColors.textSecondary,
                       fontSize: 15,
                     ),
                   ),
                   const SizedBox(height: 40),
-                  // Form card
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.55),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.6),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          AppStrings.login,
-                          style: TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
-                          ),
+                  // Glass form card
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          gradient: AppColors.glassGradient,
+                          border: Border.all(color: AppColors.glassBorder),
                         ),
-                        const SizedBox(height: 24),
-                        // Email
-                        TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          validator: Validators.email,
-                          decoration: const InputDecoration(
-                            hintText: 'example@mail.com',
-                            prefixIcon: Icon(Icons.email_outlined,
-                                color: AppColors.textHint),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // Password
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          validator: Validators.password,
-                          decoration: InputDecoration(
-                            hintText: AppStrings.password,
-                            prefixIcon: const Icon(Icons.lock_outline,
-                                color: AppColors.textHint),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: AppColors.textHint,
-                              ),
-                              onPressed: () => setState(
-                                  () => _obscurePassword = !_obscurePassword),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () =>
-                                context.push(AppRoutes.forgotPassword),
-                            child: Text(
-                              AppStrings.forgotPassword,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppStrings.login,
                               style: TextStyle(
-                                color: AppColors.secondary,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 24),
+                            TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: Validators.email,
+                              decoration: const InputDecoration(
+                                hintText: 'example@mail.com',
+                                prefixIcon: Icon(Icons.alternate_email_rounded,
+                                    color: AppColors.textHint),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              validator: Validators.password,
+                              decoration: InputDecoration(
+                                hintText: AppStrings.password,
+                                prefixIcon: const Icon(
+                                    Icons.lock_outline_rounded,
+                                    color: AppColors.textHint),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    color: AppColors.textHint,
+                                  ),
+                                  onPressed: () => setState(() =>
+                                      _obscurePassword = !_obscurePassword),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () =>
+                                    context.push(AppRoutes.forgotPassword),
+                                child: Text(
+                                  AppStrings.forgotPassword,
+                                  style: TextStyle(
+                                    color: AppColors.deepMoss,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 54,
+                              child: ElevatedButton(
+                                onPressed: _loading ? null : _login,
+                                child: _loading
+                                    ? const SizedBox(
+                                        width: 22,
+                                        height: 22,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : Text(AppStrings.login),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 12),
-                        // Login button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 54,
-                          child: ElevatedButton(
-                            onPressed: _loading ? null : _login,
-                            child: _loading
-                                ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Text(AppStrings.login),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),
-                  // Register link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -222,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           AppStrings.register,
                           style: TextStyle(
-                            color: AppColors.secondary,
+                            color: AppColors.deepMoss,
                             fontWeight: FontWeight.w700,
                             fontSize: 14,
                           ),

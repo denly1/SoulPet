@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -73,9 +74,7 @@ class _SplashScreenState extends State<SplashScreen>
         decoration: const BoxDecoration(gradient: AppColors.warmGradient),
         child: Stack(
           children: [
-            // Decorative bubbles
             ..._buildBubbles(),
-            // Main content
             Center(
               child: FadeTransition(
                 opacity: _fadeAnim,
@@ -84,52 +83,43 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Logo container — glass-like rounded square
-                      Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(36),
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.white.withValues(alpha: 0.7),
-                              Colors.white.withValues(alpha: 0.3),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.6),
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.secondary.withValues(alpha: 0.25),
-                              blurRadius: 30,
-                              spreadRadius: 5,
+                      // Glass logo
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(36),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                          child: Container(
+                            width: 140,
+                            height: 140,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(36),
+                              gradient: AppColors.glassGradient,
+                              border: Border.all(
+                                  color: AppColors.glassBorder, width: 2),
+                              boxShadow: AppColors.glassShadow,
                             ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.pets_rounded,
-                              size: 64, color: AppColors.secondary),
+                            child: Center(
+                              child: Icon(Icons.spa_rounded,
+                                  size: 64, color: AppColors.deepMoss),
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 28),
-                      const Text(
+                      Text(
                         'Soulpet',
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 38,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           letterSpacing: 1.5,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Твой цифровой компаньон',
+                        'Спокойный AI-компаньон',
                         style: TextStyle(
-                          color: AppColors.textSecondary.withValues(alpha: 0.8),
+                          color: AppColors.textSecondary,
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
@@ -139,7 +129,7 @@ class _SplashScreenState extends State<SplashScreen>
                         width: 28,
                         height: 28,
                         child: CircularProgressIndicator(
-                          color: AppColors.secondary.withValues(alpha: 0.6),
+                          color: AppColors.deepMoss.withValues(alpha: 0.5),
                           strokeWidth: 2.5,
                         ),
                       ),
@@ -156,10 +146,11 @@ class _SplashScreenState extends State<SplashScreen>
 
   List<Widget> _buildBubbles() {
     final rng = Random(42);
-    return List.generate(8, (i) {
-      final size = 20.0 + rng.nextDouble() * 60;
-      final top = rng.nextDouble() * 700;
-      final left = rng.nextDouble() * 400;
+    final screen = MediaQuery.of(context).size;
+    return List.generate(10, (i) {
+      final size = 20.0 + rng.nextDouble() * 70;
+      final top = rng.nextDouble() * screen.height;
+      final left = rng.nextDouble() * screen.width;
       return Positioned(
         top: top,
         left: left,
@@ -170,12 +161,12 @@ class _SplashScreenState extends State<SplashScreen>
             shape: BoxShape.circle,
             gradient: RadialGradient(
               colors: [
-                Colors.white.withValues(alpha: 0.35),
+                AppColors.softJade.withValues(alpha: 0.25),
                 Colors.white.withValues(alpha: 0.05),
               ],
             ),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: AppColors.glassBorder,
               width: 1,
             ),
           ),

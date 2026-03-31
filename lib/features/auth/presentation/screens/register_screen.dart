@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -68,7 +69,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 24),
-                  // Back
                   Align(
                     alignment: Alignment.centerLeft,
                     child: IconButton(
@@ -78,120 +78,127 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Icon(Icons.pets_rounded,
-                      size: 48, color: AppColors.secondary),
+                  Icon(Icons.spa_outlined,
+                      size: 48, color: AppColors.deepMoss),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     'Создать аккаунт',
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 26,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Твой питомец уже ждёт',
                     style: TextStyle(
-                      color: AppColors.textSecondary.withValues(alpha: 0.8),
+                      color: AppColors.textSecondary,
                       fontSize: 15,
                     ),
                   ),
                   const SizedBox(height: 32),
-                  // Form card
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.55),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.6),
+                  // Glass form card
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          gradient: AppColors.glassGradient,
+                          border: Border.all(color: AppColors.glassBorder),
+                        ),
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              controller: _usernameController,
+                              validator: Validators.username,
+                              decoration: const InputDecoration(
+                                hintText: 'Имя пользователя',
+                                prefixIcon: Icon(Icons.person_outline_rounded,
+                                    color: AppColors.textHint),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: Validators.email,
+                              decoration: const InputDecoration(
+                                hintText: 'example@mail.com',
+                                prefixIcon: Icon(
+                                    Icons.alternate_email_rounded,
+                                    color: AppColors.textHint),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              validator: Validators.password,
+                              decoration: InputDecoration(
+                                hintText: 'Пароль (мин. 8 символов)',
+                                prefixIcon: const Icon(
+                                    Icons.lock_outline_rounded,
+                                    color: AppColors.textHint),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    color: AppColors.textHint,
+                                  ),
+                                  onPressed: () => setState(() =>
+                                      _obscurePassword = !_obscurePassword),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              obscureText: _obscureConfirm,
+                              validator: (v) => Validators.confirmPassword(
+                                  v, _passwordController.text),
+                              decoration: InputDecoration(
+                                hintText: 'Повторите пароль',
+                                prefixIcon: const Icon(
+                                    Icons.lock_outline_rounded,
+                                    color: AppColors.textHint),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureConfirm
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    color: AppColors.textHint,
+                                  ),
+                                  onPressed: () => setState(() =>
+                                      _obscureConfirm = !_obscureConfirm),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 54,
+                              child: ElevatedButton(
+                                onPressed: _loading ? null : _register,
+                                child: _loading
+                                    ? const SizedBox(
+                                        width: 22,
+                                        height: 22,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : Text(AppStrings.register),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: _usernameController,
-                          validator: Validators.username,
-                          decoration: const InputDecoration(
-                            hintText: 'Имя пользователя',
-                            prefixIcon: Icon(Icons.person_outline,
-                                color: AppColors.textHint),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          validator: Validators.email,
-                          decoration: const InputDecoration(
-                            hintText: 'example@mail.com',
-                            prefixIcon: Icon(Icons.email_outlined,
-                                color: AppColors.textHint),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          validator: Validators.password,
-                          decoration: InputDecoration(
-                            hintText: 'Пароль (мин. 8 символов)',
-                            prefixIcon: const Icon(Icons.lock_outline,
-                                color: AppColors.textHint),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: AppColors.textHint,
-                              ),
-                              onPressed: () => setState(
-                                  () => _obscurePassword = !_obscurePassword),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        TextFormField(
-                          controller: _confirmPasswordController,
-                          obscureText: _obscureConfirm,
-                          validator: (v) => Validators.confirmPassword(
-                              v, _passwordController.text),
-                          decoration: InputDecoration(
-                            hintText: 'Повторите пароль',
-                            prefixIcon: const Icon(Icons.lock_outline,
-                                color: AppColors.textHint),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureConfirm
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: AppColors.textHint,
-                              ),
-                              onPressed: () => setState(
-                                  () => _obscureConfirm = !_obscureConfirm),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 54,
-                          child: ElevatedButton(
-                            onPressed: _loading ? null : _register,
-                            child: _loading
-                                ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Text(AppStrings.register),
-                          ),
-                        ),
-                      ],
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -210,7 +217,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: Text(
                           AppStrings.login,
                           style: TextStyle(
-                            color: AppColors.secondary,
+                            color: AppColors.deepMoss,
                             fontWeight: FontWeight.w700,
                             fontSize: 14,
                           ),

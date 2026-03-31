@@ -4,9 +4,17 @@ import 'package:soulpet/core/constants/app_colors.dart';
 class AppTheme {
   AppTheme._();
 
+  static const String _fontFamily = 'Inter';
+
   static ThemeData get lightTheme => ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
+        fontFamily: _fontFamily,
+        textTheme: const TextTheme().apply(
+          bodyColor: AppColors.textPrimary,
+          displayColor: AppColors.textPrimary,
+          fontFamily: _fontFamily,
+        ),
         colorScheme: const ColorScheme.light(
           primary: AppColors.primary,
           secondary: AppColors.secondary,
@@ -22,15 +30,16 @@ class AppTheme {
           elevation: 0,
           centerTitle: true,
           titleTextStyle: TextStyle(
+            fontFamily: _fontFamily,
             color: AppColors.textPrimary,
             fontSize: 18,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
           ),
           iconTheme: IconThemeData(color: AppColors.textPrimary),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.secondary,
+            backgroundColor: AppColors.deepMoss,
             foregroundColor: Colors.white,
             minimumSize: const Size(double.infinity, 54),
             elevation: 0,
@@ -38,20 +47,22 @@ class AppTheme {
               borderRadius: BorderRadius.circular(16),
             ),
             textStyle: const TextStyle(
+              fontFamily: _fontFamily,
               fontSize: 16,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.primary,
-            side: const BorderSide(color: AppColors.secondary, width: 1.5),
+            side: const BorderSide(color: AppColors.mistBorder, width: 1.5),
             minimumSize: const Size(double.infinity, 54),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
             textStyle: const TextStyle(
+              fontFamily: _fontFamily,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -59,7 +70,7 @@ class AppTheme {
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: AppColors.cardLight,
+          fillColor: AppColors.pearlFog,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           border: OutlineInputBorder(
@@ -68,12 +79,12 @@ class AppTheme {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(
-                color: AppColors.secondary.withValues(alpha: 0.3), width: 1),
+            borderSide: const BorderSide(
+                color: AppColors.mistBorder, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.secondary, width: 2),
+            borderSide: const BorderSide(color: AppColors.deepMoss, width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
@@ -83,7 +94,7 @@ class AppTheme {
           labelStyle: const TextStyle(color: AppColors.textSecondary),
         ),
         cardTheme: CardThemeData(
-          color: AppColors.cardLight,
+          color: AppColors.frostedSage,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),

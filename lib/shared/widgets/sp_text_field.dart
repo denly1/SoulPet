@@ -40,22 +40,19 @@ class SpTextField extends StatelessWidget {
       enabled: enabled,
       onChanged: onChanged,
       style: const TextStyle(
-        color: AppColors.textLight,
-        fontFamily: 'Nunito',
+        color: AppColors.textPrimary,
         fontSize: 15,
       ),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         filled: true,
-        fillColor: AppColors.backgroundDark.withOpacity(0.5),
+        fillColor: AppColors.pearlFog,
         labelStyle: const TextStyle(
           color: AppColors.textHint,
-          fontFamily: 'Nunito',
         ),
         hintStyle: const TextStyle(
           color: AppColors.textHint,
-          fontFamily: 'Nunito',
           fontSize: 14,
         ),
         prefixIcon: prefixIcon != null
@@ -65,17 +62,17 @@ class SpTextField extends StatelessWidget {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide:
-              BorderSide(color: AppColors.textHint.withOpacity(0.3)),
+              const BorderSide(color: AppColors.mistBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide:
-              BorderSide(color: AppColors.textHint.withOpacity(0.3)),
+              const BorderSide(color: AppColors.mistBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide:
-              const BorderSide(color: AppColors.primaryLight, width: 2),
+              const BorderSide(color: AppColors.deepMoss, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -87,7 +84,6 @@ class SpTextField extends StatelessWidget {
         ),
         errorStyle: const TextStyle(
           color: AppColors.error,
-          fontFamily: 'Nunito',
           fontSize: 12,
         ),
         contentPadding:

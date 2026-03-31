@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -16,11 +17,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedTab = 0;
 
   static const _tabs = [
-    _TabInfo(Icons.home_rounded, 'Главная'),
-    _TabInfo(Icons.chat_bubble_rounded, 'Чат'),
-    _TabInfo(Icons.store_rounded, 'Магазин'),
-    _TabInfo(Icons.sports_esports_rounded, 'Игры'),
-    _TabInfo(Icons.person_rounded, 'Профиль'),
+    _TabInfo(Icons.spa_outlined, 'Главная'),
+    _TabInfo(Icons.forum_outlined, 'Чат'),
+    _TabInfo(Icons.local_mall_outlined, 'Магазин'),
+    _TabInfo(Icons.extension_outlined, 'Игры'),
+    _TabInfo(Icons.account_circle_outlined, 'Профиль'),
   ];
 
   Future<void> _logout() async {
@@ -30,97 +31,188 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(gradient: AppColors.warmGradient),
         child: SafeArea(
-          child: Column(
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 12, 8),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withValues(alpha: 0.7),
-                            Colors.white.withValues(alpha: 0.3),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.5),
-                        ),
-                      ),
-                      child: const Icon(Icons.pets_rounded,
-                          color: AppColors.secondary, size: 22),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Soulpet',
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: Icon(Icons.settings_rounded,
-                          color: AppColors.textSecondary.withValues(alpha: 0.6),
-                          size: 22),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.logout_rounded,
-                          color: AppColors.textSecondary.withValues(alpha: 0.6),
-                          size: 22),
-                      onPressed: _logout,
-                    ),
-                  ],
-                ),
-              ),
-              // Content area
-              Expanded(
-                child: _buildTabContent(),
-              ),
-            ],
-          ),
+          child: isLandscape ? _buildLandscape() : _buildPortrait(),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
+  // ── Portrait layout ──
+  Widget _buildPortrait() {
+    return Column(
+      children: [
+        _buildHeader(),
+        Expanded(child: _buildTabContent()),
+        const SizedBox(height: 8),
+        _buildFloatingNav(),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  // ── Landscape layout ──
+  Widget _buildLandscape() {
+    return Row(
+      children: [
+        // Side nav in landscape
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(_tabs.length, (i) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: _buildNavIcon(i),
+              );
+            }),
+          ),
+        ),
+        Expanded(
+          child: Column(
+            children: [
+              _buildHeader(),
+              Expanded(child: _buildTabContent()),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── Header ──
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 12, 4),
+      child: Row(
+        children: [
+          _GlassCircle(
+            size: 40,
+            child: Icon(Icons.spa_rounded,
+                color: AppColors.deepMoss, size: 20),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            'Soulpet',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const Spacer(),
+          _GlassCircle(
+            size: 36,
+            onTap: () {},
+            child: Icon(Icons.tune_rounded,
+                color: AppColors.textSecondary, size: 18),
+          ),
+          const SizedBox(width: 8),
+          _GlassCircle(
+            size: 36,
+            onTap: _logout,
+            child: Icon(Icons.logout_rounded,
+                color: AppColors.textSecondary, size: 18),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Floating round glass nav icons (bottom, no bar) ──
+  Widget _buildFloatingNav() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(_tabs.length, (i) => _buildNavIcon(i)),
+      ),
+    );
+  }
+
+  Widget _buildNavIcon(int i) {
+    final isSelected = i == _selectedTab;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedTab = i),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
+            width: isSelected ? 56 : 48,
+            height: isSelected ? 56 : 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: isSelected
+                    ? [
+                        AppColors.softJade.withValues(alpha: 0.7),
+                        AppColors.liquidGreen.withValues(alpha: 0.35),
+                      ]
+                    : [
+                        Colors.white.withValues(alpha: 0.5),
+                        Colors.white.withValues(alpha: 0.18),
+                      ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border: Border.all(
+                color: isSelected
+                    ? AppColors.deepMoss.withValues(alpha: 0.35)
+                    : AppColors.glassBorder,
+                width: 1.5,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.liquidGreen.withValues(alpha: 0.25),
+                        blurRadius: 16,
+                        spreadRadius: 1,
+                      )
+                    ]
+                  : AppColors.glassShadow,
+            ),
+            child: Icon(
+              _tabs[i].icon,
+              size: isSelected ? 24 : 21,
+              color: isSelected ? AppColors.deepMoss : AppColors.textHint,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            _tabs[i].label,
+            style: TextStyle(
+              color: isSelected ? AppColors.deepMoss : AppColors.textHint,
+              fontSize: 10,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Tab content ──
   Widget _buildTabContent() {
     switch (_selectedTab) {
       case 0:
         return _buildHomeTab();
       case 1:
-        return _buildPlaceholderTab(
-          Icons.chat_bubble_rounded,
-          'AI Чат',
-          'Общение с питомцем через AI-ассистента',
-        );
+        return _buildPlaceholder(
+            Icons.forum_outlined, 'AI Чат', 'Общение с питомцем через AI');
       case 2:
-        return _buildPlaceholderTab(
-          Icons.store_rounded,
-          'Магазин',
-          'Предметы и аксессуары для питомца',
-        );
+        return _buildPlaceholder(Icons.local_mall_outlined, 'Магазин',
+            'Предметы и аксессуары для питомца');
       case 3:
-        return _buildPlaceholderTab(
-          Icons.sports_esports_rounded,
-          'Мини-игры',
-          'Игры для развлечения питомца',
-        );
+        return _buildPlaceholder(Icons.extension_outlined, 'Мини-игры',
+            'Игры для развлечения питомца');
       case 4:
         return _buildProfileTab();
       default:
@@ -128,6 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // ── Home tab ──
   Widget _buildHomeTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -135,35 +228,11 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          // Welcome card
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withValues(alpha: 0.65),
-                  Colors.white.withValues(alpha: 0.3),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.5),
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.secondary.withValues(alpha: 0.1),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
+          // Welcome glass card
+          _GlassCard(
             child: Column(
               children: [
-                const Text(
+                Text(
                   'Добро пожаловать!',
                   style: TextStyle(
                     color: AppColors.textPrimary,
@@ -171,31 +240,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   'Заботься о своём питомце',
                   style: TextStyle(
-                    color: AppColors.textSecondary.withValues(alpha: 0.8),
+                    color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Pet placeholder
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(32),
-                    color: Colors.white.withValues(alpha: 0.5),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.6),
-                    ),
-                  ),
-                  child: Icon(Icons.pets_rounded,
-                      size: 56,
-                      color: AppColors.secondary.withValues(alpha: 0.5)),
+                _GlassCircle(
+                  size: 110,
+                  child: Icon(Icons.spa_rounded,
+                      size: 52,
+                      color: AppColors.deepMoss.withValues(alpha: 0.45)),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 Text(
                   'Твой питомец',
                   style: TextStyle(
@@ -207,64 +267,47 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          // Menu items
-          _buildMenuItem(
-            icon: Icons.favorite_rounded,
+          const SizedBox(height: 16),
+          _GlassMenuItem(
+            icon: Icons.favorite_outline_rounded,
             title: 'Здоровье',
             subtitle: 'Отслеживай состояние питомца',
             onTap: () {},
           ),
-          const SizedBox(height: 12),
-          _buildMenuItem(
-            icon: Icons.chat_bubble_outline_rounded,
+          const SizedBox(height: 10),
+          _GlassMenuItem(
+            icon: Icons.forum_outlined,
             title: 'AI Чат',
             subtitle: 'Общайся с помощником',
             onTap: () => setState(() => _selectedTab = 1),
           ),
-          const SizedBox(height: 12),
-          _buildMenuItem(
+          const SizedBox(height: 10),
+          _GlassMenuItem(
             icon: Icons.lightbulb_outline_rounded,
             title: 'Советы и статьи',
             subtitle: 'Полезная информация',
             onTap: () {},
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
         ],
       ),
     );
   }
 
+  // ── Profile tab ──
   Widget _buildProfileTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
-          const SizedBox(height: 32),
-          // Avatar
-          Container(
-            width: 90,
-            height: 90,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withValues(alpha: 0.7),
-                  Colors.white.withValues(alpha: 0.3),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.5),
-                width: 2,
-              ),
-            ),
-            child: const Icon(Icons.person_rounded,
-                size: 44, color: AppColors.secondary),
+          const SizedBox(height: 28),
+          _GlassCircle(
+            size: 88,
+            child: Icon(Icons.account_circle_outlined,
+                size: 44, color: AppColors.deepMoss),
           ),
-          const SizedBox(height: 16),
-          const Text(
+          const SizedBox(height: 14),
+          Text(
             'Пользователь',
             style: TextStyle(
               color: AppColors.textPrimary,
@@ -276,80 +319,58 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             'user@soulpet.app',
             style: TextStyle(
-              color: AppColors.textSecondary.withValues(alpha: 0.7),
+              color: AppColors.textSecondary,
               fontSize: 14,
             ),
           ),
-          const SizedBox(height: 32),
-          _buildMenuItem(
-            icon: Icons.edit_rounded,
+          const SizedBox(height: 28),
+          _GlassMenuItem(
+            icon: Icons.edit_outlined,
             title: 'Редактировать профиль',
             subtitle: 'Имя, аватар, настройки',
             onTap: () {},
           ),
-          const SizedBox(height: 12),
-          _buildMenuItem(
-            icon: Icons.pets_rounded,
+          const SizedBox(height: 10),
+          _GlassMenuItem(
+            icon: Icons.spa_outlined,
             title: 'Мой питомец',
             subtitle: 'Информация о питомце',
             onTap: () {},
           ),
-          const SizedBox(height: 12),
-          _buildMenuItem(
-            icon: Icons.inventory_2_rounded,
+          const SizedBox(height: 10),
+          _GlassMenuItem(
+            icon: Icons.inventory_2_outlined,
             title: 'Инвентарь',
             subtitle: 'Предметы и аксессуары',
             onTap: () {},
           ),
-          const SizedBox(height: 12),
-          _buildMenuItem(
+          const SizedBox(height: 10),
+          _GlassMenuItem(
             icon: Icons.logout_rounded,
             title: 'Выйти',
             subtitle: 'Выход из аккаунта',
             onTap: _logout,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
         ],
       ),
     );
   }
 
-  Widget _buildPlaceholderTab(IconData icon, String title, String subtitle) {
+  // ── Placeholder tab ──
+  Widget _buildPlaceholder(IconData icon, String title, String subtitle) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withValues(alpha: 0.6),
-                  Colors.white.withValues(alpha: 0.2),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.5),
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.secondary.withValues(alpha: 0.12),
-                  blurRadius: 20,
-                  spreadRadius: 3,
-                ),
-              ],
-            ),
-            child: Icon(icon, size: 48, color: AppColors.secondary),
+          _GlassCircle(
+            size: 100,
+            child: Icon(icon, size: 46, color: AppColors.deepMoss),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 22,
               fontWeight: FontWeight.w700,
@@ -362,24 +383,32 @@ class _HomeScreenState extends State<HomeScreen> {
               subtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppColors.textSecondary.withValues(alpha: 0.8),
+                color: AppColors.textSecondary,
                 fontSize: 14,
               ),
             ),
           ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: AppColors.secondary.withValues(alpha: 0.1),
-            ),
-            child: Text(
-              'Скоро',
-              style: TextStyle(
-                color: AppColors.secondary,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+          const SizedBox(height: 20),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: AppColors.glassGradient,
+                  border: Border.all(color: AppColors.glassBorder),
+                ),
+                child: Text(
+                  'Скоро',
+                  style: TextStyle(
+                    color: AppColors.deepMoss,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
           ),
@@ -387,130 +416,135 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
 
-  Widget _buildMenuItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: onTap,
+// ── Reusable glass widgets ──
+
+class _GlassCard extends StatelessWidget {
+  final Widget child;
+  const _GlassCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            color: Colors.white.withValues(alpha: 0.45),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.5),
-            ),
+            borderRadius: BorderRadius.circular(24),
+            gradient: AppColors.glassGradient,
+            border: Border.all(color: AppColors.glassBorder, width: 1.5),
+            boxShadow: AppColors.glassShadow,
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: AppColors.secondary.withValues(alpha: 0.12),
-                ),
-                child: Icon(icon, color: AppColors.secondary, size: 22),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: AppColors.textSecondary.withValues(alpha: 0.7),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right_rounded,
-                  color: AppColors.textHint.withValues(alpha: 0.5), size: 22),
-            ],
-          ),
+          child: child,
         ),
       ),
     );
   }
+}
 
-  Widget _buildBottomNav() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardLight,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.secondary.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, -2),
+class _GlassCircle extends StatelessWidget {
+  final double size;
+  final Widget child;
+  final VoidCallback? onTap;
+  const _GlassCircle({required this.size, required this.child, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final content = ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.5),
+                Colors.white.withValues(alpha: 0.15),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            border: Border.all(color: AppColors.glassBorder, width: 1.5),
+            boxShadow: AppColors.glassShadow,
           ),
-        ],
+          child: Center(child: child),
+        ),
       ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(_tabs.length, (i) {
-              final isSelected = i == _selectedTab;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedTab = i),
-                behavior: HitTestBehavior.opaque,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.secondary.withValues(alpha: 0.12)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
+    );
+    if (onTap != null) {
+      return GestureDetector(onTap: onTap, child: content);
+    }
+    return content;
+  }
+}
+
+class _GlassMenuItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+  const _GlassMenuItem({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              gradient: AppColors.glassGradient,
+              border: Border.all(color: AppColors.glassBorder),
+            ),
+            child: Row(
+              children: [
+                _GlassCircle(
+                  size: 42,
+                  child: Icon(icon, color: AppColors.deepMoss, size: 20),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        _tabs[i].icon,
-                        size: isSelected ? 24 : 22,
-                        color: isSelected
-                            ? AppColors.secondary
-                            : AppColors.textHint,
-                      ),
-                      const SizedBox(height: 3),
                       Text(
-                        _tabs[i].label,
+                        title,
                         style: TextStyle(
-                          color: isSelected
-                              ? AppColors.secondary
-                              : AppColors.textHint,
-                          fontSize: 11,
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                          color: AppColors.textPrimary,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 12,
                         ),
                       ),
                     ],
                   ),
                 ),
-              );
-            }),
+                Icon(Icons.chevron_right_rounded,
+                    color: AppColors.textHint, size: 22),
+              ],
+            ),
           ),
         ),
       ),
