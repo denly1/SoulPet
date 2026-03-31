@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -8,6 +7,7 @@ import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/core/utils/validators.dart';
 import 'package:soulpet/domain/usecases/auth/register_usecase.dart';
 import 'package:soulpet/shared/widgets/sp_snackbar.dart';
+import 'package:soulpet/shared/widgets/liquid_glass.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -78,8 +78,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Icon(Icons.spa_outlined,
-                      size: 48, color: AppColors.deepMoss),
+                  LiquidGlassCircle(
+                    size: 80,
+                    child: Icon(Icons.spa_outlined,
+                        size: 40, color: AppColors.deepMoss),
+                  ),
                   const SizedBox(height: 12),
                   Text(
                     'Создать аккаунт',
@@ -99,23 +102,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 32),
                   // Glass form card
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(
-                        sigmaX: AppColors.glassBlurSigma,
-                        sigmaY: AppColors.glassBlurSigma,
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          gradient: AppColors.glassGradient,
-                          border: Border.all(color: AppColors.glassBorder, width: 0.8),
-                          boxShadow: AppColors.glassShadow,
-                        ),
-                        child: Column(
-                          children: [
+                  LiquidGlassCard(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
                             TextFormField(
                               controller: _usernameController,
                               validator: Validators.username,
@@ -200,9 +190,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     : Text(AppStrings.register),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 24),

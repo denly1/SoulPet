@@ -79,58 +79,57 @@ class AppColors {
     end: Alignment.bottomCenter,
   );
 
-  // ── Liquid Glass (iOS 26 style) ──
+  // ── Liquid Glass (iOS 26 / Apple Vision Pro style) ──
 
-  // Glass fill — very transparent, top-lit inner gradient
+  // Glass fill — nearly transparent, the blur does the heavy lifting
   static LinearGradient get glassGradient => LinearGradient(
         colors: [
-          Colors.white.withValues(alpha: 0.38),
+          Colors.white.withValues(alpha: 0.22),
+          Colors.white.withValues(alpha: 0.08),
+          Colors.white.withValues(alpha: 0.03),
+        ],
+        stops: const [0.0, 0.5, 1.0],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      );
+
+  // Slightly denser glass for small interactive elements (icons, pills)
+  static LinearGradient get glassGradientStrong => LinearGradient(
+        colors: [
+          Colors.white.withValues(alpha: 0.35),
           Colors.white.withValues(alpha: 0.12),
-          Colors.white.withValues(alpha: 0.06),
+          Colors.white.withValues(alpha: 0.05),
         ],
         stops: const [0.0, 0.45, 1.0],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       );
 
-  // Stronger glass for nav icons / small elements
-  static LinearGradient get glassGradientStrong => LinearGradient(
-        colors: [
-          Colors.white.withValues(alpha: 0.52),
-          Colors.white.withValues(alpha: 0.18),
-          Colors.white.withValues(alpha: 0.08),
-        ],
-        stops: const [0.0, 0.4, 1.0],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-      );
+  // Thin border — subtle white edge
+  static Color get glassBorder => Colors.white.withValues(alpha: 0.45);
 
-  // Top highlight border — bright white edge like light refraction
-  static Color get glassBorder => Colors.white.withValues(alpha: 0.65);
+  // Even subtler for secondary edges
+  static Color get glassBorderSubtle => Colors.white.withValues(alpha: 0.20);
 
-  // Subtle bottom/side border
-  static Color get glassBorderSubtle => Colors.white.withValues(alpha: 0.25);
+  // Top-edge highlight — bright refraction line at the top of glass
+  static Color get glassHighlight => Colors.white.withValues(alpha: 0.55);
 
-  // Outer glow shadow (soft, diffuse)
+  // Soft diffuse outer shadow
   static List<BoxShadow> get glassShadow => [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.06),
-          blurRadius: 20,
+          color: Colors.black.withValues(alpha: 0.05),
+          blurRadius: 24,
           spreadRadius: 0,
-          offset: const Offset(0, 4),
+          offset: const Offset(0, 6),
         ),
         BoxShadow(
-          color: liquidGreen.withValues(alpha: 0.08),
-          blurRadius: 32,
-          spreadRadius: -2,
+          color: deepMoss.withValues(alpha: 0.06),
+          blurRadius: 40,
+          spreadRadius: -4,
         ),
       ];
 
-  // Inner highlight glow (for decoration, not BoxShadow)
-  static Color get glassInnerHighlight =>
-      Colors.white.withValues(alpha: 0.35);
-
-  // Recommended blur sigma for glass surfaces
-  static const double glassBlurSigma = 28.0;
-  static const double glassBlurSigmaSmall = 18.0;
+  // Blur sigma
+  static const double glassBlurSigma = 30.0;
+  static const double glassBlurSigmaSmall = 20.0;
 }

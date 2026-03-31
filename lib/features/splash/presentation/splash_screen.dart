@@ -6,6 +6,7 @@ import 'package:soulpet/core/constants/app_colors.dart';
 import 'package:soulpet/core/di/injection.dart';
 import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/data/datasources/local/auth_local_datasource.dart';
+import 'package:soulpet/shared/widgets/liquid_glass.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -84,27 +85,13 @@ class _SplashScreenState extends State<SplashScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Glass logo
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(36),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaX: AppColors.glassBlurSigma,
-                            sigmaY: AppColors.glassBlurSigma,
-                          ),
-                          child: Container(
-                            width: 140,
-                            height: 140,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(36),
-                              gradient: AppColors.glassGradient,
-                              border: Border.all(color: AppColors.glassBorder, width: 0.8),
-                              boxShadow: AppColors.glassShadow,
-                            ),
-                            child: Center(
-                              child: Icon(Icons.spa_rounded,
-                                  size: 64, color: AppColors.deepMoss),
-                            ),
-                          ),
+                      SizedBox(
+                        width: 140,
+                        height: 140,
+                        child: LiquidGlassCircle(
+                          size: 140,
+                          child: Icon(Icons.spa_rounded,
+                              size: 64, color: AppColors.deepMoss),
                         ),
                       ),
                       const SizedBox(height: 28),

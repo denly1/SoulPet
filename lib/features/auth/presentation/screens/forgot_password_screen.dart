@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -7,6 +6,7 @@ import 'package:soulpet/core/di/injection.dart';
 import 'package:soulpet/core/utils/validators.dart';
 import 'package:soulpet/domain/usecases/auth/reset_password_usecase.dart';
 import 'package:soulpet/shared/widgets/sp_snackbar.dart';
+import 'package:soulpet/shared/widgets/liquid_glass.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -93,89 +93,61 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 if (!_sent)
                   Form(
                     key: _formKey,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(
-                          sigmaX: AppColors.glassBlurSigma,
-                          sigmaY: AppColors.glassBlurSigma,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24),
-                            gradient: AppColors.glassGradient,
-                            border: Border.all(color: AppColors.glassBorder, width: 0.8),
-                            boxShadow: AppColors.glassShadow,
+                    child: LiquidGlassCard(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: Validators.email,
+                            decoration: const InputDecoration(
+                              hintText: 'example@mail.com',
+                              prefixIcon: Icon(
+                                  Icons.alternate_email_rounded,
+                                  color: AppColors.textHint),
+                            ),
                           ),
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                validator: Validators.email,
-                                decoration: const InputDecoration(
-                                  hintText: 'example@mail.com',
-                                  prefixIcon: Icon(
-                                      Icons.alternate_email_rounded,
-                                      color: AppColors.textHint),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 54,
-                                child: ElevatedButton(
-                                  onPressed: _loading ? null : _sendReset,
-                                  child: _loading
-                                      ? const SizedBox(
-                                          width: 22,
-                                          height: 22,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.5,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : Text(AppStrings.sendResetLink),
-                                ),
-                              ),
-                            ],
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 54,
+                            child: ElevatedButton(
+                              onPressed: _loading ? null : _sendReset,
+                              child: _loading
+                                  ? const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text(AppStrings.sendResetLink),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   )
                 else
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color:
-                              AppColors.success.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                              color: AppColors.success
-                                  .withValues(alpha: 0.3)),
+                  LiquidGlassCard(
+                    padding: const EdgeInsets.all(24),
+                    dense: true,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.check_circle_outline_rounded,
+                            color: AppColors.success),
+                        const SizedBox(width: 12),
+                        Text(
+                          AppStrings.resetEmailSent,
+                          style: TextStyle(
+                            color: AppColors.success,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.check_circle_outline_rounded,
-                                color: AppColors.success),
-                            const SizedBox(width: 12),
-                            Text(
-                              AppStrings.resetEmailSent,
-                              style: TextStyle(
-                                color: AppColors.success,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      ],
                     ),
                   ),
               ],

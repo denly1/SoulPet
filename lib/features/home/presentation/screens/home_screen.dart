@@ -1,10 +1,10 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
 import 'package:soulpet/core/di/injection.dart';
 import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/data/datasources/local/auth_local_datasource.dart';
+import 'package:soulpet/shared/widgets/liquid_glass.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.fromLTRB(20, 12, 12, 4),
       child: Row(
         children: [
-          _GlassCircle(
+          LiquidGlassCircle(
             size: 40,
             child: Icon(Icons.spa_rounded,
                 color: AppColors.deepMoss, size: 20),
@@ -107,14 +107,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const Spacer(),
-          _GlassCircle(
+          LiquidGlassCircle(
             size: 36,
             onTap: () {},
             child: Icon(Icons.tune_rounded,
                 color: AppColors.textSecondary, size: 18),
           ),
           const SizedBox(width: 8),
-          _GlassCircle(
+          LiquidGlassCircle(
             size: 36,
             onTap: _logout,
             child: Icon(Icons.logout_rounded,
@@ -229,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const SizedBox(height: 16),
           // Welcome glass card
-          _GlassCard(
+          LiquidGlassCard(
             child: Column(
               children: [
                 Text(
@@ -249,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                _GlassCircle(
+                LiquidGlassCircle(
                   size: 110,
                   child: Icon(Icons.spa_rounded,
                       size: 52,
@@ -268,21 +268,21 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          _GlassMenuItem(
+          _buildMenuItem(
             icon: Icons.favorite_outline_rounded,
             title: 'Здоровье',
             subtitle: 'Отслеживай состояние питомца',
             onTap: () {},
           ),
           const SizedBox(height: 10),
-          _GlassMenuItem(
+          _buildMenuItem(
             icon: Icons.forum_outlined,
             title: 'AI Чат',
             subtitle: 'Общайся с помощником',
             onTap: () => setState(() => _selectedTab = 1),
           ),
           const SizedBox(height: 10),
-          _GlassMenuItem(
+          _buildMenuItem(
             icon: Icons.lightbulb_outline_rounded,
             title: 'Советы и статьи',
             subtitle: 'Полезная информация',
@@ -301,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           const SizedBox(height: 28),
-          _GlassCircle(
+          LiquidGlassCircle(
             size: 88,
             child: Icon(Icons.account_circle_outlined,
                 size: 44, color: AppColors.deepMoss),
@@ -324,28 +324,28 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 28),
-          _GlassMenuItem(
+          _buildMenuItem(
             icon: Icons.edit_outlined,
             title: 'Редактировать профиль',
             subtitle: 'Имя, аватар, настройки',
             onTap: () {},
           ),
           const SizedBox(height: 10),
-          _GlassMenuItem(
+          _buildMenuItem(
             icon: Icons.spa_outlined,
             title: 'Мой питомец',
             subtitle: 'Информация о питомце',
             onTap: () {},
           ),
           const SizedBox(height: 10),
-          _GlassMenuItem(
+          _buildMenuItem(
             icon: Icons.inventory_2_outlined,
             title: 'Инвентарь',
             subtitle: 'Предметы и аксессуары',
             onTap: () {},
           ),
           const SizedBox(height: 10),
-          _GlassMenuItem(
+          _buildMenuItem(
             icon: Icons.logout_rounded,
             title: 'Выйти',
             subtitle: 'Выход из аккаунта',
@@ -363,7 +363,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _GlassCircle(
+          LiquidGlassCircle(
             size: 100,
             child: Icon(icon, size: 46, color: AppColors.deepMoss),
           ),
@@ -389,29 +389,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: AppColors.glassBlurSigmaSmall,
-                sigmaY: AppColors.glassBlurSigmaSmall,
-              ),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  gradient: AppColors.glassGradient,
-                  border: Border.all(color: AppColors.glassBorder),
-                ),
-                child: Text(
-                  'Скоро',
-                  style: TextStyle(
-                    color: AppColors.deepMoss,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+          LiquidGlassPill(
+            child: Text(
+              'Скоро',
+              style: TextStyle(
+                color: AppColors.deepMoss,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -419,139 +403,53 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
 
-// ── Reusable glass widgets ──
-
-class _GlassCard extends StatelessWidget {
-  final Widget child;
-  const _GlassCard({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: AppColors.glassBlurSigma,
-          sigmaY: AppColors.glassBlurSigma,
-        ),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            gradient: AppColors.glassGradient,
-            border: Border.all(color: AppColors.glassBorder, width: 0.8),
-            boxShadow: AppColors.glassShadow,
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
-class _GlassCircle extends StatelessWidget {
-  final double size;
-  final Widget child;
-  final VoidCallback? onTap;
-  const _GlassCircle({required this.size, required this.child, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final content = ClipOval(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: AppColors.glassBlurSigmaSmall,
-          sigmaY: AppColors.glassBlurSigmaSmall,
-        ),
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: AppColors.glassGradientStrong,
-            border: Border.all(color: AppColors.glassBorder, width: 1),
-            boxShadow: AppColors.glassShadow,
-          ),
-          child: Center(child: child),
-        ),
-      ),
-    );
-    if (onTap != null) {
-      return GestureDetector(onTap: onTap, child: content);
-    }
-    return content;
-  }
-}
-
-class _GlassMenuItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  const _GlassMenuItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  // ── Menu item (glass row) ──
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: AppColors.glassBlurSigma,
-            sigmaY: AppColors.glassBlurSigma,
-          ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: AppColors.glassGradient,
-              border: Border.all(color: AppColors.glassBorder, width: 0.8),
-              boxShadow: AppColors.glassShadow,
+      child: LiquidGlassCard(
+        borderRadius: 20,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        dense: true,
+        child: Row(
+          children: [
+            LiquidGlassCircle(
+              size: 42,
+              child: Icon(icon, color: AppColors.deepMoss, size: 20),
             ),
-            child: Row(
-              children: [
-                _GlassCircle(
-                  size: 42,
-                  child: Icon(icon, color: AppColors.deepMoss, size: 20),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                Icon(Icons.chevron_right_rounded,
-                    color: AppColors.textHint, size: 22),
-              ],
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            Icon(Icons.chevron_right_rounded,
+                color: AppColors.textHint, size: 22),
+          ],
         ),
       ),
     );

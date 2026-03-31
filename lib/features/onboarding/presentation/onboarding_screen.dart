@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -6,6 +5,7 @@ import 'package:soulpet/core/constants/app_strings.dart';
 import 'package:soulpet/core/di/injection.dart';
 import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/data/datasources/local/auth_local_datasource.dart';
+import 'package:soulpet/shared/widgets/liquid_glass.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -97,32 +97,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           // Glass circle with icon
-                          ClipOval(
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(
-                                sigmaX: AppColors.glassBlurSigma,
-                                sigmaY: AppColors.glassBlurSigma,
-                              ),
-                              child: Container(
-                                width: 150,
-                                height: 150,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: AppColors.glassGradientStrong,
-                                  border: Border.all(
-                                    color: AppColors.glassBorder,
-                                    width: 1,
-                                  ),
-                                  boxShadow: AppColors.glassShadow,
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    _icons[index],
-                                    size: 68,
-                                    color: AppColors.deepMoss,
-                                  ),
-                                ),
-                              ),
+                          LiquidGlassCircle(
+                            size: 150,
+                            child: Icon(
+                              _icons[index],
+                              size: 68,
+                              color: AppColors.deepMoss,
                             ),
                           ),
                           const SizedBox(height: 48),

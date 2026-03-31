@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -8,6 +7,7 @@ import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/core/utils/validators.dart';
 import 'package:soulpet/domain/usecases/auth/login_usecase.dart';
 import 'package:soulpet/shared/widgets/sp_snackbar.dart';
+import 'package:soulpet/shared/widgets/liquid_glass.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -64,29 +64,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const SizedBox(height: 48),
                   // Glass logo
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(
-                        sigmaX: AppColors.glassBlurSigma,
-                        sigmaY: AppColors.glassBlurSigma,
-                      ),
-                      child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(28),
-                          gradient: AppColors.glassGradientStrong,
-                          border: Border.all(
-                              color: AppColors.glassBorder, width: 1),
-                          boxShadow: AppColors.glassShadow,
-                        ),
-                        child: Center(
-                          child: Icon(Icons.spa_rounded,
-                              size: 48, color: AppColors.deepMoss),
-                        ),
-                      ),
-                    ),
+                  LiquidGlassCircle(
+                    size: 100,
+                    child: Icon(Icons.spa_rounded,
+                        size: 48, color: AppColors.deepMoss),
                   ),
                   const SizedBox(height: 20),
                   Text(
@@ -108,102 +89,87 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
                   // Glass form card
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(
-                        sigmaX: AppColors.glassBlurSigma,
-                        sigmaY: AppColors.glassBlurSigma,
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          gradient: AppColors.glassGradient,
-                          border: Border.all(color: AppColors.glassBorder, width: 0.8),
-                          boxShadow: AppColors.glassShadow,
+                  LiquidGlassCard(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppStrings.login,
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              AppStrings.login,
+                        const SizedBox(height: 24),
+                        TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: Validators.email,
+                          decoration: const InputDecoration(
+                            hintText: 'example@mail.com',
+                            prefixIcon: Icon(Icons.alternate_email_rounded,
+                                color: AppColors.textHint),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          validator: Validators.password,
+                          decoration: InputDecoration(
+                            hintText: AppStrings.password,
+                            prefixIcon: const Icon(
+                                Icons.lock_outline_rounded,
+                                color: AppColors.textHint),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: AppColors.textHint,
+                              ),
+                              onPressed: () => setState(() =>
+                                  _obscurePassword = !_obscurePassword),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () =>
+                                context.push(AppRoutes.forgotPassword),
+                            child: Text(
+                              AppStrings.forgotPassword,
                               style: TextStyle(
-                                color: AppColors.textPrimary,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
+                                color: AppColors.deepMoss,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(height: 24),
-                            TextFormField(
-                              controller: _emailController,
-                              keyboardType: TextInputType.emailAddress,
-                              validator: Validators.email,
-                              decoration: const InputDecoration(
-                                hintText: 'example@mail.com',
-                                prefixIcon: Icon(Icons.alternate_email_rounded,
-                                    color: AppColors.textHint),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _passwordController,
-                              obscureText: _obscurePassword,
-                              validator: Validators.password,
-                              decoration: InputDecoration(
-                                hintText: AppStrings.password,
-                                prefixIcon: const Icon(
-                                    Icons.lock_outline_rounded,
-                                    color: AppColors.textHint),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscurePassword
-                                        ? Icons.visibility_outlined
-                                        : Icons.visibility_off_outlined,
-                                    color: AppColors.textHint,
-                                  ),
-                                  onPressed: () => setState(() =>
-                                      _obscurePassword = !_obscurePassword),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () =>
-                                    context.push(AppRoutes.forgotPassword),
-                                child: Text(
-                                  AppStrings.forgotPassword,
-                                  style: TextStyle(
-                                    color: AppColors.deepMoss,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 54,
-                              child: ElevatedButton(
-                                onPressed: _loading ? null : _login,
-                                child: _loading
-                                    ? const SizedBox(
-                                        width: 22,
-                                        height: 22,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.5,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : Text(AppStrings.login),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 54,
+                          child: ElevatedButton(
+                            onPressed: _loading ? null : _login,
+                            child: _loading
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(AppStrings.login),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 32),
