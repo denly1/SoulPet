@@ -17,11 +17,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedTab = 0;
 
   static const _tabs = [
-    _TabInfo(Icons.spa_outlined, 'Главная'),
-    _TabInfo(Icons.forum_outlined, 'Чат'),
-    _TabInfo(Icons.local_mall_outlined, 'Магазин'),
+    _TabInfo(Icons.home_outlined, 'Дом'),
+    _TabInfo(Icons.chat_bubble_outline_rounded, 'Чат'),
     _TabInfo(Icons.extension_outlined, 'Игры'),
-    _TabInfo(Icons.account_circle_outlined, 'Профиль'),
+    _TabInfo(Icons.storefront_outlined, 'Магазин'),
+    _TabInfo(Icons.person_outline_rounded, 'Профиль'),
   ];
 
   Future<void> _logout() async {
@@ -61,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildLandscape() {
     return Row(
       children: [
-        // Side nav in landscape
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           child: Column(
@@ -94,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           LiquidGlassCircle(
             size: 40,
-            child: Icon(Icons.spa_rounded,
+            child: Icon(Icons.pets_rounded,
                 color: AppColors.deepMoss, size: 20),
           ),
           const SizedBox(width: 10),
@@ -110,14 +109,14 @@ class _HomeScreenState extends State<HomeScreen> {
           LiquidGlassCircle(
             size: 36,
             onTap: () {},
-            child: Icon(Icons.tune_rounded,
+            child: Icon(Icons.notifications_none_rounded,
                 color: AppColors.textSecondary, size: 18),
           ),
           const SizedBox(width: 8),
           LiquidGlassCircle(
             size: 36,
-            onTap: _logout,
-            child: Icon(Icons.logout_rounded,
+            onTap: () {},
+            child: Icon(Icons.settings_outlined,
                 color: AppColors.textSecondary, size: 18),
           ),
         ],
@@ -125,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Floating round glass nav icons (bottom, no bar) ──
+  // ── Floating round glass nav icons ──
   Widget _buildFloatingNav() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -167,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: isSelected
                     ? AppColors.deepMoss.withValues(alpha: 0.35)
                     : AppColors.glassBorder,
-                width: 1.5,
+                width: 0.8,
               ),
               boxShadow: isSelected
                   ? [
@@ -206,13 +205,22 @@ class _HomeScreenState extends State<HomeScreen> {
         return _buildHomeTab();
       case 1:
         return _buildPlaceholder(
-            Icons.forum_outlined, 'AI Чат', 'Общение с питомцем через AI');
+          Icons.chat_bubble_outline_rounded,
+          'Чат с питомцем',
+          'Здесь появится возможность поговорить с питомцем',
+        );
       case 2:
-        return _buildPlaceholder(Icons.local_mall_outlined, 'Магазин',
-            'Предметы и аксессуары для питомца');
+        return _buildPlaceholder(
+          Icons.extension_outlined,
+          'Мини-игры',
+          'Игры и развлечения вместе с питомцем',
+        );
       case 3:
-        return _buildPlaceholder(Icons.extension_outlined, 'Мини-игры',
-            'Игры для развлечения питомца');
+        return _buildPlaceholder(
+          Icons.storefront_outlined,
+          'Магазин',
+          'Еда, игрушки и украшения для дома',
+        );
       case 4:
         return _buildProfileTab();
       default:
@@ -220,75 +228,137 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // ── Home tab ──
+  // ── Home tab — pet's home (main screen per skeleton) ──
   Widget _buildHomeTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return Column(
+      children: [
+        // Pet's home — main area
+        Expanded(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Room / interior placeholder
+              Positioned.fill(
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(32),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.frostedSage.withValues(alpha: 0.4),
+                        AppColors.glassMint.withValues(alpha: 0.6),
+                        AppColors.pearlFog.withValues(alpha: 0.3),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.weekend_outlined,
+                          size: 48,
+                          color: AppColors.liquidGreen.withValues(alpha: 0.3),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Дом питомца',
+                          style: TextStyle(
+                            color: AppColors.textHint,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Pet placeholder (center of the room)
+              LiquidGlassCircle(
+                size: 130,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.pets_rounded,
+                        size: 52,
+                        color: AppColors.deepMoss.withValues(alpha: 0.5)),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Питомец',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Pet speech bubble (occasional messages from pet)
+              Positioned(
+                top: 32,
+                child: LiquidGlassPill(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.auto_awesome_rounded,
+                          size: 14, color: AppColors.deepMoss),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Привет! Я рад тебя видеть.',
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Action panel — feed / pet / play / talk
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildActionButton(Icons.restaurant_outlined, 'Покормить'),
+              _buildActionButton(Icons.favorite_outline_rounded, 'Погладить'),
+              _buildActionButton(Icons.sports_esports_outlined, 'Поиграть'),
+              _buildActionButton(Icons.chat_outlined, 'Поговорить'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── Action button for pet interactions ──
+  Widget _buildActionButton(IconData icon, String label) {
+    return GestureDetector(
+      onTap: () {},
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 16),
-          // Welcome glass card
-          LiquidGlassCard(
-            child: Column(
-              children: [
-                Text(
-                  'Добро пожаловать!',
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Заботься о своём питомце',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                LiquidGlassCircle(
-                  size: 110,
-                  child: Icon(Icons.spa_rounded,
-                      size: 52,
-                      color: AppColors.deepMoss.withValues(alpha: 0.45)),
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  'Твой питомец',
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+          LiquidGlassCircle(
+            size: 52,
+            child: Icon(icon, color: AppColors.deepMoss, size: 22),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 16),
-          _buildMenuItem(
-            icon: Icons.favorite_outline_rounded,
-            title: 'Здоровье',
-            subtitle: 'Отслеживай состояние питомца',
-            onTap: () {},
-          ),
-          const SizedBox(height: 10),
-          _buildMenuItem(
-            icon: Icons.forum_outlined,
-            title: 'AI Чат',
-            subtitle: 'Общайся с помощником',
-            onTap: () => setState(() => _selectedTab = 1),
-          ),
-          const SizedBox(height: 10),
-          _buildMenuItem(
-            icon: Icons.lightbulb_outline_rounded,
-            title: 'Советы и статьи',
-            subtitle: 'Полезная информация',
-            onTap: () {},
-          ),
-          const SizedBox(height: 20),
         ],
       ),
     );
@@ -303,7 +373,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 28),
           LiquidGlassCircle(
             size: 88,
-            child: Icon(Icons.account_circle_outlined,
+            child: Icon(Icons.person_outline_rounded,
                 size: 44, color: AppColors.deepMoss),
           ),
           const SizedBox(height: 14),
@@ -332,23 +402,23 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 10),
           _buildMenuItem(
-            icon: Icons.spa_outlined,
+            icon: Icons.pets_outlined,
             title: 'Мой питомец',
-            subtitle: 'Информация о питомце',
+            subtitle: 'Характер, стадия роста',
             onTap: () {},
           ),
           const SizedBox(height: 10),
           _buildMenuItem(
             icon: Icons.inventory_2_outlined,
             title: 'Инвентарь',
-            subtitle: 'Предметы и аксессуары',
+            subtitle: 'Еда, игрушки, предметы',
             onTap: () {},
           ),
           const SizedBox(height: 10),
           _buildMenuItem(
             icon: Icons.logout_rounded,
-            title: 'Выйти',
-            subtitle: 'Выход из аккаунта',
+            title: 'Выйти из аккаунта',
+            subtitle: '',
             onTap: _logout,
           ),
           const SizedBox(height: 20),
@@ -436,14 +506,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 12,
+                  if (subtitle.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
