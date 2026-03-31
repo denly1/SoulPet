@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:soulpet/core/di/injection.dart';
 import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/core/theme/app_theme.dart';
@@ -15,6 +16,7 @@ void main() async {
   ]);
 
   await configureDependencies();
+  await LiquidGlassWidgets.initialize();
 
   runApp(const SoulPetApp());
 }

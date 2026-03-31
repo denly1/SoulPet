@@ -1,15 +1,35 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
-/// Liquid Glass container inspired by iOS 26 / Apple Vision Pro.
+/// Shared glass settings for the SoulPet app.
+const _defaultSettings = LiquidGlassSettings(
+  thickness: 0.7,
+  blur: 18.0,
+  refractiveIndex: 1.4,
+  glassColor: Color(0x18FFFFFF),
+  lightAngle: 55.0,
+  lightIntensity: 0.75,
+  ambientStrength: 0.35,
+  saturation: 1.1,
+  chromaticAberration: 0.001,
+);
+
+const _denseSettings = LiquidGlassSettings(
+  thickness: 0.85,
+  blur: 12.0,
+  refractiveIndex: 1.5,
+  glassColor: Color(0x22FFFFFF),
+  lightAngle: 55.0,
+  lightIntensity: 0.8,
+  ambientStrength: 0.3,
+  saturation: 1.15,
+  chromaticAberration: 0.001,
+);
+
+/// Liquid Glass card — shader-based iOS 26 glass effect.
 ///
-/// Layers (bottom → top):
-/// 1. BackdropFilter — strong Gaussian blur of content behind
-/// 2. Semi-transparent fill gradient (top-lit, nearly clear)
-/// 3. Inner top-edge highlight (thin bright line imitating refraction)
-/// 4. Thin uniform border
-/// 5. Soft diffuse outer shadow
+/// Uses [GlassContainer] from `liquid_glass_widgets` package
+/// with real fragment-shader refraction and blur.
 class LiquidGlassCard extends StatelessWidget {
   final Widget child;
   final double borderRadius;
@@ -26,41 +46,12 @@ class LiquidGlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sigma = dense
-        ? AppColors.glassBlurSigmaSmall
-        : AppColors.glassBlurSigma;
-    final gradient = dense
-        ? AppColors.glassGradientStrong
-        : AppColors.glassGradient;
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
-        child: Container(
-          width: double.infinity,
-          padding: padding,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(borderRadius),
-            gradient: gradient,
-            border: Border.all(
-              color: AppColors.glassBorder,
-              width: 1.5,
-            ),
-            boxShadow: AppColors.glassShadow,
-          ),
-          foregroundDecoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border(
-              top: BorderSide(
-                color: AppColors.glassHighlight,
-                width: 2.0,
-              ),
-            ),
-          ),
-          child: child,
-        ),
-      ),
+    return GlassContainer(
+      useOwnLayer: true,
+      settings: dense ? _denseSettings : _defaultSettings,
+      shape: LiquidRoundedSuperellipse(borderRadius: borderRadius),
+      padding: padding,
+      child: child,
     );
   }
 }
@@ -80,27 +71,13 @@ class LiquidGlassCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = ClipOval(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: AppColors.glassBlurSigmaSmall,
-          sigmaY: AppColors.glassBlurSigmaSmall,
-        ),
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: AppColors.glassGradientStrong,
-            border: Border.all(
-              color: AppColors.glassBorder,
-              width: 1.5,
-            ),
-            boxShadow: AppColors.glassShadow,
-          ),
-          child: Center(child: child),
-        ),
-      ),
+    final content = GlassContainer(
+      useOwnLayer: true,
+      width: size,
+      height: size,
+      settings: _denseSettings,
+      shape: const LiquidOval(),
+      child: Center(child: child),
     );
     if (onTap != null) {
       return GestureDetector(onTap: onTap, child: content);
@@ -124,27 +101,12 @@ class LiquidGlassPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pill = ClipRRect(
-      borderRadius: BorderRadius.circular(100),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: AppColors.glassBlurSigmaSmall,
-          sigmaY: AppColors.glassBlurSigmaSmall,
-        ),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(100),
-            gradient: AppColors.glassGradientStrong,
-            border: Border.all(
-              color: AppColors.glassBorder,
-              width: 1.5,
-            ),
-            boxShadow: AppColors.glassShadow,
-          ),
-          child: child,
-        ),
-      ),
+    final pill = GlassContainer(
+      useOwnLayer: true,
+      settings: _denseSettings,
+      shape: const LiquidRoundedSuperellipse(borderRadius: 100),
+      padding: padding,
+      child: child,
     );
     if (onTap != null) {
       return GestureDetector(onTap: onTap, child: pill);
