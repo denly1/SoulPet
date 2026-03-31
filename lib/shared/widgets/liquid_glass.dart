@@ -45,7 +45,7 @@ class LiquidGlassCard extends StatelessWidget {
             gradient: gradient,
             border: Border.all(
               color: AppColors.glassBorder,
-              width: 0.5,
+              width: 1.5,
             ),
             boxShadow: AppColors.glassShadow,
           ),
@@ -54,7 +54,7 @@ class LiquidGlassCard extends StatelessWidget {
             border: Border(
               top: BorderSide(
                 color: AppColors.glassHighlight,
-                width: 1.0,
+                width: 2.0,
               ),
             ),
           ),
@@ -94,7 +94,7 @@ class LiquidGlassCircle extends StatelessWidget {
             gradient: AppColors.glassGradientStrong,
             border: Border.all(
               color: AppColors.glassBorder,
-              width: 0.5,
+              width: 1.5,
             ),
             boxShadow: AppColors.glassShadow,
           ),
@@ -138,8 +138,9 @@ class LiquidGlassPill extends StatelessWidget {
             gradient: AppColors.glassGradientStrong,
             border: Border.all(
               color: AppColors.glassBorder,
-              width: 0.5,
+              width: 1.5,
             ),
+            boxShadow: AppColors.glassShadow,
           ),
           child: child,
         ),

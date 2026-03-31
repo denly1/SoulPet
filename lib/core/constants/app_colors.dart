@@ -81,55 +81,56 @@ class AppColors {
 
   // ── Liquid Glass (iOS 26 / Apple Vision Pro style) ──
 
-  // Glass fill — nearly transparent, the blur does the heavy lifting
+  // Glass fill — visible frosted white, background bleeds through blur
   static LinearGradient get glassGradient => LinearGradient(
         colors: [
-          Colors.white.withValues(alpha: 0.22),
-          Colors.white.withValues(alpha: 0.08),
-          Colors.white.withValues(alpha: 0.03),
+          Colors.white.withValues(alpha: 0.55),
+          Colors.white.withValues(alpha: 0.35),
+          Colors.white.withValues(alpha: 0.25),
         ],
         stops: const [0.0, 0.5, 1.0],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       );
 
-  // Slightly denser glass for small interactive elements (icons, pills)
+  // Denser glass for small interactive elements (icons, pills, action buttons)
   static LinearGradient get glassGradientStrong => LinearGradient(
         colors: [
-          Colors.white.withValues(alpha: 0.35),
-          Colors.white.withValues(alpha: 0.12),
-          Colors.white.withValues(alpha: 0.05),
+          Colors.white.withValues(alpha: 0.70),
+          Colors.white.withValues(alpha: 0.45),
+          Colors.white.withValues(alpha: 0.30),
         ],
         stops: const [0.0, 0.45, 1.0],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       );
 
-  // Thin border — subtle white edge
-  static Color get glassBorder => Colors.white.withValues(alpha: 0.45);
+  // Border — visible white edge like real glass
+  static Color get glassBorder => Colors.white.withValues(alpha: 0.75);
 
-  // Even subtler for secondary edges
-  static Color get glassBorderSubtle => Colors.white.withValues(alpha: 0.20);
+  // Subtler border for secondary edges
+  static Color get glassBorderSubtle => Colors.white.withValues(alpha: 0.40);
 
   // Top-edge highlight — bright refraction line at the top of glass
-  static Color get glassHighlight => Colors.white.withValues(alpha: 0.55);
+  static Color get glassHighlight => Colors.white.withValues(alpha: 0.85);
 
-  // Soft diffuse outer shadow
+  // Visible outer shadow — gives depth to glass cards
   static List<BoxShadow> get glassShadow => [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.05),
-          blurRadius: 24,
+          color: Colors.black.withValues(alpha: 0.08),
+          blurRadius: 20,
           spreadRadius: 0,
-          offset: const Offset(0, 6),
+          offset: const Offset(0, 8),
         ),
         BoxShadow(
-          color: deepMoss.withValues(alpha: 0.06),
-          blurRadius: 40,
-          spreadRadius: -4,
+          color: deepMoss.withValues(alpha: 0.12),
+          blurRadius: 32,
+          spreadRadius: -2,
+          offset: const Offset(0, 4),
         ),
       ];
 
-  // Blur sigma
-  static const double glassBlurSigma = 30.0;
-  static const double glassBlurSigmaSmall = 20.0;
+  // Blur sigma — strong enough to see frosted effect
+  static const double glassBlurSigma = 24.0;
+  static const double glassBlurSigmaSmall = 16.0;
 }
