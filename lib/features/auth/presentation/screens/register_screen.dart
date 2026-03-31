@@ -102,13 +102,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(24),
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                      filter: ImageFilter.blur(
+                        sigmaX: AppColors.glassBlurSigma,
+                        sigmaY: AppColors.glassBlurSigma,
+                      ),
                       child: Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(24),
                           gradient: AppColors.glassGradient,
-                          border: Border.all(color: AppColors.glassBorder),
+                          border: Border.all(color: AppColors.glassBorder, width: 0.8),
+                          boxShadow: AppColors.glassShadow,
                         ),
                         child: Column(
                           children: [

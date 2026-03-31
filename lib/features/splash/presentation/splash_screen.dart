@@ -87,15 +87,17 @@ class _SplashScreenState extends State<SplashScreen>
                       ClipRRect(
                         borderRadius: BorderRadius.circular(36),
                         child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                          filter: ImageFilter.blur(
+                            sigmaX: AppColors.glassBlurSigma,
+                            sigmaY: AppColors.glassBlurSigma,
+                          ),
                           child: Container(
                             width: 140,
                             height: 140,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(36),
                               gradient: AppColors.glassGradient,
-                              border: Border.all(
-                                  color: AppColors.glassBorder, width: 2),
+                              border: Border.all(color: AppColors.glassBorder, width: 0.8),
                               boxShadow: AppColors.glassShadow,
                             ),
                             child: Center(

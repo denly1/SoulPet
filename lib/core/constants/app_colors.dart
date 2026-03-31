@@ -79,25 +79,58 @@ class AppColors {
     end: Alignment.bottomCenter,
   );
 
-  // Glass surface gradient
+  // ── Liquid Glass (iOS 26 style) ──
+
+  // Glass fill — very transparent, top-lit inner gradient
   static LinearGradient get glassGradient => LinearGradient(
         colors: [
-          Colors.white.withValues(alpha: 0.45),
-          Colors.white.withValues(alpha: 0.15),
+          Colors.white.withValues(alpha: 0.38),
+          Colors.white.withValues(alpha: 0.12),
+          Colors.white.withValues(alpha: 0.06),
         ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
+        stops: const [0.0, 0.45, 1.0],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
       );
 
-  // Glass border color
-  static Color get glassBorder => Colors.white.withValues(alpha: 0.55);
+  // Stronger glass for nav icons / small elements
+  static LinearGradient get glassGradientStrong => LinearGradient(
+        colors: [
+          Colors.white.withValues(alpha: 0.52),
+          Colors.white.withValues(alpha: 0.18),
+          Colors.white.withValues(alpha: 0.08),
+        ],
+        stops: const [0.0, 0.4, 1.0],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      );
 
-  // Glass shadow
+  // Top highlight border — bright white edge like light refraction
+  static Color get glassBorder => Colors.white.withValues(alpha: 0.65);
+
+  // Subtle bottom/side border
+  static Color get glassBorderSubtle => Colors.white.withValues(alpha: 0.25);
+
+  // Outer glow shadow (soft, diffuse)
   static List<BoxShadow> get glassShadow => [
         BoxShadow(
-          color: liquidGreen.withValues(alpha: 0.12),
-          blurRadius: 24,
-          spreadRadius: 2,
+          color: Colors.black.withValues(alpha: 0.06),
+          blurRadius: 20,
+          spreadRadius: 0,
+          offset: const Offset(0, 4),
+        ),
+        BoxShadow(
+          color: liquidGreen.withValues(alpha: 0.08),
+          blurRadius: 32,
+          spreadRadius: -2,
         ),
       ];
+
+  // Inner highlight glow (for decoration, not BoxShadow)
+  static Color get glassInnerHighlight =>
+      Colors.white.withValues(alpha: 0.35);
+
+  // Recommended blur sigma for glass surfaces
+  static const double glassBlurSigma = 28.0;
+  static const double glassBlurSigmaSmall = 18.0;
 }

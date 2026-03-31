@@ -392,7 +392,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+              filter: ImageFilter.blur(
+                sigmaX: AppColors.glassBlurSigmaSmall,
+                sigmaY: AppColors.glassBlurSigmaSmall,
+              ),
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -429,14 +432,17 @@ class _GlassCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        filter: ImageFilter.blur(
+          sigmaX: AppColors.glassBlurSigma,
+          sigmaY: AppColors.glassBlurSigma,
+        ),
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
             gradient: AppColors.glassGradient,
-            border: Border.all(color: AppColors.glassBorder, width: 1.5),
+            border: Border.all(color: AppColors.glassBorder, width: 0.8),
             boxShadow: AppColors.glassShadow,
           ),
           child: child,
@@ -456,21 +462,17 @@ class _GlassCircle extends StatelessWidget {
   Widget build(BuildContext context) {
     final content = ClipOval(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        filter: ImageFilter.blur(
+          sigmaX: AppColors.glassBlurSigmaSmall,
+          sigmaY: AppColors.glassBlurSigmaSmall,
+        ),
         child: Container(
           width: size,
           height: size,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.5),
-                Colors.white.withValues(alpha: 0.15),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            border: Border.all(color: AppColors.glassBorder, width: 1.5),
+            gradient: AppColors.glassGradientStrong,
+            border: Border.all(color: AppColors.glassBorder, width: 1),
             boxShadow: AppColors.glassShadow,
           ),
           child: Center(child: child),
@@ -501,15 +503,19 @@ class _GlassMenuItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          filter: ImageFilter.blur(
+            sigmaX: AppColors.glassBlurSigma,
+            sigmaY: AppColors.glassBlurSigma,
+          ),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(20),
               gradient: AppColors.glassGradient,
-              border: Border.all(color: AppColors.glassBorder),
+              border: Border.all(color: AppColors.glassBorder, width: 0.8),
+              boxShadow: AppColors.glassShadow,
             ),
             child: Row(
               children: [

@@ -67,15 +67,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(28),
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      filter: ImageFilter.blur(
+                        sigmaX: AppColors.glassBlurSigma,
+                        sigmaY: AppColors.glassBlurSigma,
+                      ),
                       child: Container(
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(28),
-                          gradient: AppColors.glassGradient,
+                          gradient: AppColors.glassGradientStrong,
                           border: Border.all(
-                              color: AppColors.glassBorder, width: 1.5),
+                              color: AppColors.glassBorder, width: 1),
                           boxShadow: AppColors.glassShadow,
                         ),
                         child: Center(
@@ -108,13 +111,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(24),
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                      filter: ImageFilter.blur(
+                        sigmaX: AppColors.glassBlurSigma,
+                        sigmaY: AppColors.glassBlurSigma,
+                      ),
                       child: Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(24),
                           gradient: AppColors.glassGradient,
-                          border: Border.all(color: AppColors.glassBorder),
+                          border: Border.all(color: AppColors.glassBorder, width: 0.8),
+                          boxShadow: AppColors.glassShadow,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

@@ -99,17 +99,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           // Glass circle with icon
                           ClipOval(
                             child: BackdropFilter(
-                              filter:
-                                  ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              filter: ImageFilter.blur(
+                                sigmaX: AppColors.glassBlurSigma,
+                                sigmaY: AppColors.glassBlurSigma,
+                              ),
                               child: Container(
                                 width: 150,
                                 height: 150,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  gradient: AppColors.glassGradient,
+                                  gradient: AppColors.glassGradientStrong,
                                   border: Border.all(
                                     color: AppColors.glassBorder,
-                                    width: 1.5,
+                                    width: 1,
                                   ),
                                   boxShadow: AppColors.glassShadow,
                                 ),
