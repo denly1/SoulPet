@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:soulpet/core/di/injection.dart';
-import 'package:soulpet/core/storage/secure_storage.dart';
 import 'package:soulpet/features/splash/presentation/splash_screen.dart';
 import 'package:soulpet/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:soulpet/features/auth/presentation/screens/login_screen.dart';

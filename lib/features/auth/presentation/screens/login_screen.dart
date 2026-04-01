@@ -54,59 +54,54 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: const BoxDecoration(gradient: AppColors.warmGradient),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 56),
+                  const SizedBox(height: 48),
 
-                  // ── Logo ──
+                  // ── Paw glass circle ──
                   LiquidGlassCircle(
-                    size: 96,
+                    size: 84,
                     child: Icon(Icons.pets_rounded,
-                        size: 48, color: AppColors.deepMoss),
+                        size: 42, color: AppColors.deepMoss),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 22),
 
-                  // ── Title ──
-                  Text(
-                    'Soul Pet',
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 36,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Добро пожаловать обратно',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-
-                  // ── Form card ──
+                  // ── Glass form card ──
                   LiquidGlassCard(
-                    borderRadius: 28,
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                    borderRadius: 32,
+                    padding: const EdgeInsets.fromLTRB(22, 28, 22, 24),
                     child: Column(
                       children: [
+                        // Title
+                        Text(
+                          'Soul Pet',
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 22),
+
+                        // Email field
                         _AuthField(
                           controller: _emailController,
-                          hint: 'Email',
+                          hint: 'Enter your email',
                           validator: Validators.email,
                           icon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
+
+                        // Password field
                         _AuthField(
                           controller: _passwordController,
-                          hint: 'Пароль',
+                          hint: 'Password',
                           validator: Validators.password,
                           icon: Icons.lock_outline_rounded,
                           obscureText: _obscurePassword,
@@ -116,16 +111,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           onSuffixTap: () => setState(
                               () => _obscurePassword = !_obscurePassword),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 10),
 
-                        // ── Forgot password ──
+                        // Forgot password
                         Align(
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
                             onTap: () =>
                                 context.push(AppRoutes.forgotPassword),
                             child: Text(
-                              'Забыли пароль?',
+                              'Forgot password?',
                               style: TextStyle(
                                 color: AppColors.deepMoss,
                                 fontSize: 13,
@@ -136,20 +131,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // ── Login button ──
+                        // Sign In button
                         _PrimaryButton(
-                          label: 'Войти',
+                          label: 'Sign In',
                           loading: _loading,
                           onTap: _login,
                         ),
                         const SizedBox(height: 16),
 
-                        // ── Register link ──
+                        // Don't have account
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Ещё нет аккаунта? ',
+                              "Don't have an account? ",
                               style: TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 14,
@@ -158,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             GestureDetector(
                               onTap: () => context.go(AppRoutes.register),
                               child: Text(
-                                'Создать',
+                                'Sign Up',
                                 style: TextStyle(
                                   color: AppColors.deepMoss,
                                   fontSize: 14,
@@ -171,32 +166,41 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 28),
 
-                  // ── OR divider ──
+                  // ── OR ──
                   _OrDivider(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
 
-                  // ── Social buttons (Google + Apple only) ──
+                  // ── Sign in with label ──
+                  Text(
+                    'Sign in with',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // ── Social pill buttons ──
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _SocialButton(
-                        label: 'Google',
+                      _SocialPill(
                         icon: Icons.g_mobiledata_rounded,
                         iconColor: const Color(0xFFEA4335),
                         onTap: () {},
                       ),
-                      const SizedBox(width: 16),
-                      _SocialButton(
-                        label: 'Apple',
+                      const SizedBox(width: 14),
+                      _SocialPill(
                         icon: Icons.apple_rounded,
                         iconColor: AppColors.textPrimary,
                         onTap: () {},
                       ),
                     ],
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 44),
                 ],
               ),
             ),
@@ -208,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Shared auth widgets (mirrored from register_screen.dart)
+// Shared auth widgets
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _AuthField extends StatelessWidget {
@@ -235,7 +239,7 @@ class _AuthField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LiquidGlassCard(
-      borderRadius: 18,
+      borderRadius: 50,
       padding: EdgeInsets.zero,
       child: TextFormField(
         controller: controller,
@@ -250,31 +254,33 @@ class _AuthField extends StatelessWidget {
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(color: AppColors.textHint, fontSize: 15),
-          prefixIcon: Container(
-            margin: const EdgeInsets.only(left: 4),
-            child: Icon(icon, color: AppColors.liquidGreen, size: 22),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: Icon(icon, color: AppColors.deepMoss, size: 20),
           ),
           suffixIcon: suffixIcon != null
               ? GestureDetector(
                   onTap: onSuffixTap,
-                  child: Icon(suffixIcon,
-                      color: AppColors.textHint, size: 20),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Icon(suffixIcon, color: AppColors.textHint, size: 20),
+                  ),
                 )
               : null,
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(color: AppColors.error, width: 1),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(color: AppColors.error, width: 1.5),
           ),
           filled: false,
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         ),
       ),
     );
@@ -301,16 +307,23 @@ class _PrimaryButton extends StatelessWidget {
         width: double.infinity,
         height: 54,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.deepMoss, AppColors.liquidGreen],
+          gradient: LinearGradient(
+            colors: [
+              AppColors.deepMoss.withValues(alpha: 0.85),
+              AppColors.liquidGreen.withValues(alpha: 0.75),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.5),
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.deepMoss.withValues(alpha: 0.35),
-              blurRadius: 16,
+              color: AppColors.deepMoss.withValues(alpha: 0.25),
+              blurRadius: 18,
               offset: const Offset(0, 6),
             ),
           ],
@@ -329,7 +342,7 @@ class _PrimaryButton extends StatelessWidget {
                   label,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 17,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.3,
                   ),
@@ -349,7 +362,7 @@ class _OrDivider extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'или',
+            'or',
             style: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 13,
@@ -363,14 +376,12 @@ class _OrDivider extends StatelessWidget {
   }
 }
 
-class _SocialButton extends StatelessWidget {
-  final String label;
+class _SocialPill extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final VoidCallback onTap;
 
-  const _SocialButton({
-    required this.label,
+  const _SocialPill({
     required this.icon,
     required this.iconColor,
     required this.onTap,
@@ -381,23 +392,9 @@ class _SocialButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: LiquidGlassCard(
-        borderRadius: 18,
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: iconColor, size: 24),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
+        borderRadius: 50,
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+        child: Icon(icon, color: iconColor, size: 28),
       ),
     );
   }
