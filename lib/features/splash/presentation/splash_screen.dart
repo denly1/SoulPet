@@ -46,17 +46,17 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     final authDatasource = sl<AuthLocalDatasource>();
-    final isLoggedIn = await authDatasource.hasValidSession();
     final isOnboardingDone = await authDatasource.isOnboardingDone();
+
+    // Always clear session on app start — user must login every time
+    await authDatasource.clearTokens();
 
     if (!mounted) return;
 
     if (!isOnboardingDone) {
       context.go(AppRoutes.onboarding);
-    } else if (!isLoggedIn) {
-      context.go(AppRoutes.login);
     } else {
-      context.go(AppRoutes.home);
+      context.go(AppRoutes.login);
     }
   }
 
