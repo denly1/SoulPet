@@ -31,40 +31,41 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: const Color(0xFFE2F0E7),
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(gradient: AppColors.warmGradient),
         child: SafeArea(
-          child: Column(
-            children: [
-              // ── Top status pills ──
-              _TopBar(onProfile: () => _showProfile(context)),
-              const SizedBox(height: 12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 10),
 
-              // ── Central pet home area ──
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _PetHomeArea(screenSize: size),
+                // ── Top status pills ──
+                _TopBar(onProfile: () => _showProfile(context)),
+                const SizedBox(height: 14),
+
+                // ── Central pet home area (takes remaining space) ──
+                Expanded(
+                  child: _PetHomeArea(),
                 ),
-              ),
+                const SizedBox(height: 14),
 
-              // ── Action circles row ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _ActionRow(
+                // ── Action circles row ──
+                _ActionRow(
                   onChat: () => context.push(AppRoutes.chat),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 14),
 
-              // ── Big paw pill ──
-              _PawPill(),
-              const SizedBox(height: 24),
-            ],
+                // ── Big paw pill ──
+                _PawPill(),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -93,40 +94,37 @@ class _TopBarState extends State<_TopBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
-      child: Row(
-        children: [
-          _Pill(child: Text(_time,
-              style: TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w700))),
-          const SizedBox(width: 8),
-          _Pill(child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.pets_rounded, size: 13, color: AppColors.deepMoss),
-            const SizedBox(width: 5),
-            Text('Balance 423', style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-          ])),
-          const SizedBox(width: 8),
-          _Pill(child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.mail_outline_rounded, size: 14, color: AppColors.deepMoss),
-            const SizedBox(width: 4),
-            Text('2', style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-          ])),
-          const Spacer(),
-          _Pill(child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.thunderstorm_outlined, size: 14, color: AppColors.deepMoss),
-            const SizedBox(width: 4),
-            Text('19°C', style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-          ])),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: widget.onProfile,
-            child: LiquidGlassCircle(
-              size: 40,
-              child: Icon(Icons.person_rounded, size: 20, color: AppColors.deepMoss),
-            ),
+    return Row(
+      children: [
+        _Pill(child: Text(_time,
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700))),
+        const SizedBox(width: 7),
+        _Pill(child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.monetization_on_rounded, size: 13, color: AppColors.deepMoss),
+          const SizedBox(width: 4),
+          const Text('423', style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
+        ])),
+        const SizedBox(width: 7),
+        _Pill(child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.mail_outline_rounded, size: 13, color: AppColors.deepMoss),
+          const SizedBox(width: 4),
+          const Text('2', style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
+        ])),
+        const Spacer(),
+        _Pill(child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.wb_sunny_outlined, size: 13, color: AppColors.deepMoss),
+          const SizedBox(width: 4),
+          const Text('19°C', style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
+        ])),
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: widget.onProfile,
+          child: LiquidGlassCircle(
+            size: 40,
+            child: const Icon(Icons.person_rounded, size: 20, color: AppColors.deepMoss),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -148,63 +146,49 @@ class _Pill extends StatelessWidget {
 // ── Pet home central area ─────────────────────────────────────────────────────
 
 class _PetHomeArea extends StatelessWidget {
-  final Size screenSize;
-  const _PetHomeArea({required this.screenSize});
+  const _PetHomeArea();
 
   @override
   Widget build(BuildContext context) {
     return LiquidGlassCard(
-      borderRadius: 36,
-      padding: const EdgeInsets.all(0),
-      child: SizedBox(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 32),
-            // Pet home icon
-            LiquidGlassCircle(
-              size: 110,
-              child: Icon(Icons.home_rounded, size: 52, color: AppColors.deepMoss),
+      borderRadius: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Pet home icon
+          LiquidGlassCircle(
+            size: 96,
+            child: const Icon(Icons.home_rounded, size: 46, color: AppColors.deepMoss),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Pet Home',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.3,
             ),
-            const SizedBox(height: 20),
-            Text(
-              'Pet Home',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.3,
-              ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Mood: Excellent 😊',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 14,
             ),
-            const SizedBox(height: 6),
-            Text(
-              'Mood: Excellent 😊',
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 15,
-              ),
-            ),
-            const SizedBox(height: 28),
-            // Status bars
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28),
-              child: Column(
-                children: [
-                  _StatusBar(label: 'Hunger', value: 0.75,
-                      color: AppColors.liquidGreen, icon: Icons.restaurant_rounded),
-                  const SizedBox(height: 12),
-                  _StatusBar(label: 'Happiness', value: 0.88,
-                      color: AppColors.deepMoss, icon: Icons.favorite_rounded),
-                  const SizedBox(height: 12),
-                  _StatusBar(label: 'Energy', value: 0.60,
-                      color: AppColors.softJade, icon: Icons.bolt_rounded),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-          ],
-        ),
+          ),
+          const SizedBox(height: 24),
+          const _StatusBar(label: 'Hunger', value: 0.75,
+              color: AppColors.liquidGreen, icon: Icons.restaurant_rounded),
+          const SizedBox(height: 10),
+          const _StatusBar(label: 'Happiness', value: 0.88,
+              color: AppColors.deepMoss, icon: Icons.favorite_rounded),
+          const SizedBox(height: 10),
+          const _StatusBar(label: 'Energy', value: 0.60,
+              color: AppColors.softJade, icon: Icons.bolt_rounded),
+        ],
       ),
     );
   }
@@ -318,8 +302,8 @@ class _PawPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return LiquidGlassCard(
       borderRadius: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 52, vertical: 14),
-      child: Icon(Icons.pets_rounded, size: 32, color: AppColors.deepMoss),
+      padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 16),
+      child: const Icon(Icons.pets_rounded, size: 30, color: AppColors.deepMoss),
     );
   }
 }

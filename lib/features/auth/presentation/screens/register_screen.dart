@@ -181,15 +181,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _SocialPill(
-                        icon: Icons.g_mobiledata_rounded,
-                        iconColor: const Color(0xFFEA4335),
+                      _SocialButton(
+                        label: 'Google',
+                        isGoogle: true,
                         onTap: () {},
                       ),
-                      const SizedBox(width: 14),
-                      _SocialPill(
-                        icon: Icons.apple_rounded,
-                        iconColor: AppColors.textPrimary,
+                      const SizedBox(width: 12),
+                      _SocialButton(
+                        label: 'Apple',
+                        isGoogle: false,
                         onTap: () {},
                       ),
                     ],
@@ -370,14 +370,14 @@ class _OrDivider extends StatelessWidget {
   }
 }
 
-class _SocialPill extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
+class _SocialButton extends StatelessWidget {
+  final String label;
+  final bool isGoogle;
   final VoidCallback onTap;
 
-  const _SocialPill({
-    required this.icon,
-    required this.iconColor,
+  const _SocialButton({
+    required this.label,
+    required this.isGoogle,
     required this.onTap,
   });
 
@@ -387,8 +387,50 @@ class _SocialPill extends StatelessWidget {
       onTap: onTap,
       child: LiquidGlassCard(
         borderRadius: 50,
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-        child: Icon(icon, color: iconColor, size: 28),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isGoogle)
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: Text(
+                    'G',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFFEA4335),
+                      height: 1.0,
+                    ),
+                  ),
+                ),
+              )
+            else
+              const Icon(Icons.apple_rounded,
+                  size: 22, color: AppColors.textPrimary),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

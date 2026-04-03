@@ -1,35 +1,48 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
-/// Shared glass settings for the SoulPet app.
-const _defaultSettings = LiquidGlassSettings(
-  thickness: 0.7,
-  blur: 18.0,
-  refractiveIndex: 1.4,
-  glassColor: Color(0x18FFFFFF),
-  lightAngle: 55.0,
-  lightIntensity: 0.75,
-  ambientStrength: 0.35,
-  saturation: 1.1,
-  chromaticAberration: 0.001,
-);
+// ─── Glass design tokens ────────────────────────────────────────────────────
 
-const _denseSettings = LiquidGlassSettings(
-  thickness: 0.85,
-  blur: 12.0,
-  refractiveIndex: 1.5,
-  glassColor: Color(0x22FFFFFF),
-  lightAngle: 55.0,
-  lightIntensity: 0.8,
-  ambientStrength: 0.3,
-  saturation: 1.15,
-  chromaticAberration: 0.001,
-);
+const double _kBlur = 22.0;
+const double _kBlurSmall = 14.0;
 
-/// Liquid Glass card — shader-based iOS 26 glass effect.
-///
-/// Uses [GlassContainer] from `liquid_glass_widgets` package
-/// with real fragment-shader refraction and blur.
+// White fill — soft frosted
+LinearGradient _glassGradient() => LinearGradient(
+      colors: [
+        const Color(0xFFFFFFFF).withValues(alpha: 0.52),
+        const Color(0xFFFFFFFF).withValues(alpha: 0.30),
+        const Color(0xFFFFFFFF).withValues(alpha: 0.18),
+      ],
+      stops: const [0.0, 0.55, 1.0],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+// Top-left highlight refraction line
+Color _glassHighlight() => const Color(0xFFFFFFFF).withValues(alpha: 0.80);
+
+// Border
+Color _glassBorder() => const Color(0xFFFFFFFF).withValues(alpha: 0.60);
+
+// Outer shadow
+List<BoxShadow> _glassShadow() => [
+      BoxShadow(
+        color: const Color(0xFF000000).withValues(alpha: 0.07),
+        blurRadius: 24,
+        spreadRadius: 0,
+        offset: const Offset(0, 8),
+      ),
+      BoxShadow(
+        color: const Color(0xFF6F9B84).withValues(alpha: 0.10),
+        blurRadius: 36,
+        spreadRadius: -4,
+        offset: const Offset(0, 4),
+      ),
+    ];
+
+// ─── LiquidGlassCard ────────────────────────────────────────────────────────
+
+/// Frosted-glass card with crisp corners, no clipping artifacts.
 class LiquidGlassCard extends StatelessWidget {
   final Widget child;
   final double borderRadius;
@@ -46,17 +59,47 @@ class LiquidGlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassContainer(
-      useOwnLayer: true,
-      settings: dense ? _denseSettings : _defaultSettings,
-      shape: LiquidRoundedSuperellipse(borderRadius: borderRadius),
-      padding: padding,
-      child: child,
+    final r = BorderRadius.circular(borderRadius);
+    final sigma = dense ? _kBlurSmall : _kBlur;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: r,
+        boxShadow: _glassShadow(),
+      ),
+      child: ClipRRect(
+        borderRadius: r,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+          child: Container(
+            padding: padding,
+            decoration: BoxDecoration(
+              borderRadius: r,
+              gradient: _glassGradient(),
+              border: Border.all(
+                color: _glassBorder(),
+                width: 1.0,
+              ),
+            ),
+            foregroundDecoration: BoxDecoration(
+              borderRadius: r,
+              border: Border(
+                top: BorderSide(color: _glassHighlight(), width: 1.2),
+                left: BorderSide(
+                    color: _glassHighlight().withValues(alpha: 0.45), width: 0.8),
+              ),
+            ),
+            child: child,
+          ),
+        ),
+      ),
     );
   }
 }
 
-/// Circular liquid glass element (nav icons, avatars, small buttons).
+// ─── LiquidGlassCircle ──────────────────────────────────────────────────────
+
+/// Circular frosted-glass element — perfect circle, crisp edges.
 class LiquidGlassCircle extends StatelessWidget {
   final double size;
   final Widget child;
@@ -71,14 +114,48 @@ class LiquidGlassCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = GlassContainer(
-      useOwnLayer: true,
+    final content = Container(
       width: size,
       height: size,
-      settings: _denseSettings,
-      shape: const LiquidOval(),
-      child: Center(child: child),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF000000).withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipOval(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: _kBlurSmall, sigmaY: _kBlurSmall),
+          child: Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFFFFFFFF).withValues(alpha: 0.65),
+                  const Color(0xFFFFFFFF).withValues(alpha: 0.35),
+                  const Color(0xFFFFFFFF).withValues(alpha: 0.20),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border: Border.all(
+                color: const Color(0xFFFFFFFF).withValues(alpha: 0.65),
+                width: 1.0,
+              ),
+            ),
+            child: Center(child: child),
+          ),
+        ),
+      ),
     );
+
     if (onTap != null) {
       return GestureDetector(onTap: onTap, child: content);
     }
@@ -86,7 +163,9 @@ class LiquidGlassCircle extends StatelessWidget {
   }
 }
 
-/// Rounded-rect liquid glass pill (small badges, tags, status bars).
+// ─── LiquidGlassPill ────────────────────────────────────────────────────────
+
+/// Pill-shaped frosted-glass badge / tag.
 class LiquidGlassPill extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -101,12 +180,20 @@ class LiquidGlassPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pill = GlassContainer(
-      useOwnLayer: true,
-      settings: _denseSettings,
-      shape: const LiquidRoundedSuperellipse(borderRadius: 100),
-      padding: padding,
-      child: child,
+    final pill = ClipRRect(
+      borderRadius: BorderRadius.circular(100),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: _kBlurSmall, sigmaY: _kBlurSmall),
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            gradient: _glassGradient(),
+            border: Border.all(color: _glassBorder(), width: 1.0),
+          ),
+          child: child,
+        ),
+      ),
     );
     if (onTap != null) {
       return GestureDetector(onTap: onTap, child: pill);

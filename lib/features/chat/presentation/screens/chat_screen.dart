@@ -249,49 +249,58 @@ class _InputBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
       child: LiquidGlassCard(
         borderRadius: 50,
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        padding: const EdgeInsets.fromLTRB(16, 6, 6, 6),
         child: Row(
           children: [
-            // Paw button
-            LiquidGlassCircle(
-              size: 40,
-              child: Icon(Icons.pets_rounded,
-                  size: 20, color: AppColors.deepMoss),
-            ),
-            const SizedBox(width: 8),
             // Text field
             Expanded(
               child: TextField(
                 controller: controller,
-                style: TextStyle(
+                style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 15),
                 onSubmitted: (_) => onSend(),
+                textInputAction: TextInputAction.send,
                 decoration: InputDecoration(
                   hintText: 'Write a message...',
                   hintStyle: TextStyle(
                       color: AppColors.textHint, fontSize: 15),
                   border: InputBorder.none,
                   isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 ),
               ),
             ),
-            const SizedBox(width: 4),
-            // Emoji button
-            LiquidGlassCircle(
-              size: 40,
-              child: Icon(Icons.sentiment_satisfied_rounded,
-                  size: 20, color: AppColors.deepMoss),
-            ),
-            const SizedBox(width: 6),
-            // Mic / Send button
+            const SizedBox(width: 8),
+            // Send button
             GestureDetector(
               onTap: onSend,
-              child: LiquidGlassCircle(
-                size: 40,
-                child: Icon(Icons.mic_rounded,
-                    size: 20, color: AppColors.deepMoss),
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.deepMoss.withValues(alpha: 0.90),
+                      AppColors.liquidGreen.withValues(alpha: 0.80),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.deepMoss.withValues(alpha: 0.28),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.arrow_upward_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
               ),
             ),
           ],
