@@ -82,7 +82,6 @@ class LiquidGlassCard extends StatelessWidget {
               ),
             ),
             foregroundDecoration: BoxDecoration(
-              borderRadius: r,
               border: Border(
                 top: BorderSide(color: _glassHighlight(), width: 1.2),
                 left: BorderSide(

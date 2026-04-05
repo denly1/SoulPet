@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -168,7 +169,7 @@ class _MessageBubble extends StatelessWidget {
                     fontSize: 10,
                     fontWeight: FontWeight.w500)),
             const SizedBox(width: 6),
-            // Bubble
+            // Bubble (no tail for user messages)
             ConstrainedBox(
               constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.65),
@@ -204,28 +205,35 @@ class _MessageBubble extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Bubble with integrated tail
                 ConstrainedBox(
                   constraints: BoxConstraints(
                       maxWidth: MediaQuery.of(context).size.width * 0.65),
-                  child: LiquidGlassCard(
-                    borderRadius: 22,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    child: Text(
-                      msg.text,
-                      style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 15,
-                          height: 1.4),
+                  child: CustomPaint(
+                    painter: _MessageBubbleWithTailPainter(),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      child: Text(
+                        msg.text,
+                        style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 15,
+                            height: 1.4),
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 3),
-                Text(msg.time,
-                    style: TextStyle(
-                        color: AppColors.textHint,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500)),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Text(msg.time,
+                      style: TextStyle(
+                          color: AppColors.textHint,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500)),
+                ),
               ],
             ),
           ],
@@ -237,73 +245,195 @@ class _MessageBubble extends StatelessWidget {
 
 // ── Input bar ─────────────────────────────────────────────────────────────────
 
-class _InputBar extends StatelessWidget {
+class _InputBar extends StatefulWidget {
   final TextEditingController controller;
   final VoidCallback onSend;
 
   const _InputBar({required this.controller, required this.onSend});
 
   @override
+  State<_InputBar> createState() => _InputBarState();
+}
+
+class _InputBarState extends State<_InputBar> {
+  bool _hasText = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onTextChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onTextChanged);
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    final hasText = widget.controller.text.trim().isNotEmpty;
+    if (hasText != _hasText) {
+      setState(() {
+        _hasText = hasText;
+      });
+    }
+  }
+
+  void _showEmojiPicker() {
+    // TODO: Implement emoji picker
+    // For now, just show a placeholder
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Emoji picker coming soon! 😊'),
+        duration: const Duration(seconds: 1),
+        backgroundColor: AppColors.deepMoss,
+      ),
+    );
+  }
+
+  void _startVoiceRecording() {
+    // TODO: Implement voice recording
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Voice recording coming soon! 🎤'),
+        duration: const Duration(seconds: 1),
+        backgroundColor: AppColors.deepMoss,
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-      child: LiquidGlassCard(
-        borderRadius: 50,
-        padding: const EdgeInsets.fromLTRB(16, 6, 6, 6),
-        child: Row(
-          children: [
-            // Text field
-            Expanded(
-              child: TextField(
-                controller: controller,
-                style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 15),
-                onSubmitted: (_) => onSend(),
-                textInputAction: TextInputAction.send,
-                decoration: InputDecoration(
-                  hintText: 'Write a message...',
-                  hintStyle: TextStyle(
-                      color: AppColors.textHint, fontSize: 15),
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            // Send button
-            GestureDetector(
-              onTap: onSend,
-              child: Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.deepMoss.withValues(alpha: 0.90),
-                      AppColors.liquidGreen.withValues(alpha: 0.80),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.deepMoss.withValues(alpha: 0.28),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.arrow_upward_rounded,
-                  color: Colors.white,
-                  size: 22,
-                ),
-              ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF000000).withValues(alpha: 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
             ),
           ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(50),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFFFFFFFF).withValues(alpha: 0.85),
+                    const Color(0xFFFFFFFF).withValues(alpha: 0.75),
+                    const Color(0xFFFFFFFF).withValues(alpha: 0.65),
+                  ],
+                  stops: const [0.0, 0.5, 1.0],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(
+                  color: const Color(0xFFFFFFFF).withValues(alpha: 0.75),
+                  width: 1.0,
+                ),
+              ),
+              child: Row(
+                children: [
+                  // Paw icon (left)
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.pets_rounded,
+                        size: 22,
+                        color: AppColors.deepMoss.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  // Text field
+                  Expanded(
+                    child: TextField(
+                      controller: widget.controller,
+                      style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 15),
+                      onSubmitted: (_) => widget.onSend(),
+                      textInputAction: TextInputAction.send,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        hintText: 'Написать сообщение...',
+                        hintStyle: TextStyle(
+                            color: AppColors.textHint, fontSize: 15),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  // Emoji icon
+                  GestureDetector(
+                    onTap: _showEmojiPicker,
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.emoji_emotions_outlined,
+                        size: 22,
+                        color: AppColors.deepMoss.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  // Voice/Send button
+                  GestureDetector(
+                    onTap: () {
+                      if (_hasText) {
+                        widget.onSend();
+                      } else {
+                        _startVoiceRecording();
+                      }
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.deepMoss.withValues(alpha: 0.90),
+                            AppColors.liquidGreen.withValues(alpha: 0.80),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.deepMoss.withValues(alpha: 0.28),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        _hasText ? Icons.arrow_upward_rounded : Icons.mic_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -317,4 +447,107 @@ class _Message {
   final bool isUser;
   final String time;
   const _Message({required this.text, required this.isUser, required this.time});
+}
+
+// ── Message bubble with tail painter ─────────────────────────────────────────
+
+class _MessageBubbleWithTailPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..shader = ui.Gradient.linear(
+        Offset(0, 0),
+        Offset(size.width, size.height),
+        [
+          const Color(0xFFFFFFFF).withValues(alpha: 0.65),
+          const Color(0xFFFFFFFF).withValues(alpha: 0.35),
+        ],
+      )
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    const radius = 22.0;
+    const tailWidth = 8.0;
+    const tailHeight = 10.0;
+    
+    // Start from top-left, after the tail area
+    path.moveTo(tailWidth + radius, 0);
+    
+    // Top-right corner
+    path.lineTo(size.width - radius, 0);
+    path.arcToPoint(
+      Offset(size.width, radius),
+      radius: const Radius.circular(radius),
+    );
+    
+    // Right side
+    path.lineTo(size.width, size.height - radius);
+    
+    // Bottom-right corner
+    path.arcToPoint(
+      Offset(size.width - radius, size.height),
+      radius: const Radius.circular(radius),
+    );
+    
+    // Bottom side
+    path.lineTo(tailWidth + radius, size.height);
+    
+    // Bottom-left corner (where tail connects)
+    path.arcToPoint(
+      Offset(tailWidth, size.height - radius),
+      radius: const Radius.circular(radius),
+    );
+    
+    // Left side down to tail connection point
+    final tailConnectionY = size.height - radius - 4;
+    path.lineTo(tailWidth, tailConnectionY + tailHeight);
+    
+    // Tail - smooth curve pointing left
+    path.quadraticBezierTo(
+      tailWidth * 0.3, tailConnectionY + tailHeight * 0.7,
+      0, tailConnectionY + tailHeight * 0.5,
+    );
+    path.quadraticBezierTo(
+      tailWidth * 0.3, tailConnectionY + tailHeight * 0.3,
+      tailWidth, tailConnectionY,
+    );
+    
+    // Continue left side up
+    path.lineTo(tailWidth, radius);
+    
+    // Top-left corner
+    path.arcToPoint(
+      Offset(tailWidth + radius, 0),
+      radius: const Radius.circular(radius),
+    );
+    
+    path.close();
+
+    // Draw shadow
+    canvas.drawShadow(path, Colors.black.withValues(alpha: 0.06), 16, false);
+    
+    // Draw fill
+    canvas.drawPath(path, paint);
+
+    // Draw border
+    final borderPaint = Paint()
+      ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.65)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    canvas.drawPath(path, borderPaint);
+    
+    // Draw highlight on top and left
+    final highlightPaint = Paint()
+      ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.75)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+    
+    final highlightPath = Path();
+    highlightPath.moveTo(tailWidth + radius, 0.6);
+    highlightPath.lineTo(size.width - radius, 0.6);
+    canvas.drawPath(highlightPath, highlightPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

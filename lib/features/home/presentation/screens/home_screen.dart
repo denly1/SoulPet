@@ -15,6 +15,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _actionsVisible = false;
+
   Future<void> _logout() async {
     await sl<AuthLocalDatasource>().clearTokens();
     if (mounted) context.go(AppRoutes.login);
@@ -56,13 +58,44 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 14),
 
                 // ── Action circles row ──
-                _ActionRow(
-                  onChat: () => context.push(AppRoutes.chat),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 260),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, animation) {
+                    final fade = CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOut,
+                    );
+                    final slide = Tween<Offset>(
+                      begin: const Offset(0, 0.15),
+                      end: Offset.zero,
+                    ).animate(fade);
+                    return FadeTransition(
+                      opacity: fade,
+                      child: SlideTransition(position: slide, child: child),
+                    );
+                  },
+                  child: _actionsVisible
+                      ? _ActionRow(
+                          key: const ValueKey('actions'),
+                          onChat: () => context.push(AppRoutes.chat),
+                        )
+                      : const SizedBox(
+                          key: ValueKey('actions-hidden'),
+                          height: 0,
+                        ),
                 ),
                 const SizedBox(height: 14),
 
                 // ── Big paw pill ──
-                _PawPill(),
+                _PawPill(
+                  onTap: () {
+                    setState(() {
+                      _actionsVisible = !_actionsVisible;
+                    });
+                  },
+                ),
                 const SizedBox(height: 20),
               ],
             ),
@@ -243,7 +276,7 @@ class _StatusBar extends StatelessWidget {
 
 class _ActionRow extends StatelessWidget {
   final VoidCallback onChat;
-  const _ActionRow({required this.onChat});
+  const _ActionRow({super.key, required this.onChat});
 
   @override
   Widget build(BuildContext context) {
@@ -298,12 +331,18 @@ class _ActionItem {
 // ── Big paw pill ─────────────────────────────────────────────────────────────
 
 class _PawPill extends StatelessWidget {
+  final VoidCallback? onTap;
+  const _PawPill({this.onTap});
+
   @override
   Widget build(BuildContext context) {
-    return LiquidGlassCard(
-      borderRadius: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 16),
-      child: const Icon(Icons.pets_rounded, size: 30, color: AppColors.deepMoss),
+    return GestureDetector(
+      onTap: onTap,
+      child: LiquidGlassCard(
+        borderRadius: 50,
+        padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 16),
+        child: const Icon(Icons.pets_rounded, size: 30, color: AppColors.deepMoss),
+      ),
     );
   }
 }
