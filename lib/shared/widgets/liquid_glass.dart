@@ -18,9 +18,6 @@ LinearGradient _glassGradient() => LinearGradient(
       end: Alignment.bottomRight,
     );
 
-// Top-left highlight refraction line
-Color _glassHighlight() => const Color(0xFFFFFFFF).withValues(alpha: 0.80);
-
 // Border
 Color _glassBorder() => const Color(0xFFFFFFFF).withValues(alpha: 0.60);
 
@@ -79,14 +76,6 @@ class LiquidGlassCard extends StatelessWidget {
               border: Border.all(
                 color: _glassBorder(),
                 width: 1.0,
-              ),
-            ),
-            foregroundDecoration: BoxDecoration(
-              borderRadius: r,
-              border: Border(
-                top: BorderSide(color: _glassHighlight(), width: 1.2),
-                left: BorderSide(
-                    color: _glassHighlight().withValues(alpha: 0.45), width: 0.8),
               ),
             ),
             child: child,

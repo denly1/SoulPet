@@ -14,13 +14,48 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  bool _menuOpen = false;
+  late final AnimationController _menuAnim;
+  late final Animation<double> _menuFade;
+  late final Animation<Offset> _menuSlide;
+
+  @override
+  void initState() {
+    super.initState();
+    _menuAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 280),
+    );
+    _menuFade = CurvedAnimation(parent: _menuAnim, curve: Curves.easeOut);
+    _menuSlide = Tween<Offset>(
+      begin: const Offset(0, 0.25),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _menuAnim, curve: Curves.easeOutCubic));
+  }
+
+  @override
+  void dispose() {
+    _menuAnim.dispose();
+    super.dispose();
+  }
+
+  void _toggleMenu() {
+    setState(() => _menuOpen = !_menuOpen);
+    if (_menuOpen) {
+      _menuAnim.forward();
+    } else {
+      _menuAnim.reverse();
+    }
+  }
+
   Future<void> _logout() async {
     await sl<AuthLocalDatasource>().clearTokens();
     if (mounted) context.go(AppRoutes.login);
   }
 
-  void _showProfile(BuildContext context) {
+  void _showProfile() {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -32,40 +67,70 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE2F0E7),
+      backgroundColor: const Color(0xFFD8EDE0),
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(gradient: AppColors.warmGradient),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 10),
+          child: Stack(
+            children: [
+              // ── Pet home — fills entire safe area ──
+              const Positioned.fill(
+                child: _PetHomeArea(),
+              ),
 
-                // ── Top status pills ──
-                _TopBar(onProfile: () => _showProfile(context)),
-                const SizedBox(height: 14),
-
-                // ── Central pet home area (takes remaining space) ──
-                Expanded(
-                  child: _PetHomeArea(),
+              // ── Top status bar — shown only when menu is open ──
+              AnimatedBuilder(
+                animation: _menuFade,
+                builder: (_, __) => Opacity(
+                  opacity: _menuFade.value,
+                  child: IgnorePointer(
+                    ignoring: !_menuOpen,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                      child: _TopBar(onProfile: _showProfile),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 14),
+              ),
 
-                // ── Action circles row ──
-                _ActionRow(
-                  onChat: () => context.push(AppRoutes.chat),
+              // ── Floating action bubbles — shown only when open ──
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 88,
+                child: SlideTransition(
+                  position: _menuSlide,
+                  child: FadeTransition(
+                    opacity: _menuFade,
+                    child: IgnorePointer(
+                      ignoring: !_menuOpen,
+                      child: _ActionBubbles(
+                        onChat: () {
+                          _toggleMenu();
+                          context.push(AppRoutes.chat);
+                        },
+                        onClose: _toggleMenu,
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 14),
+              ),
 
-                // ── Big paw pill ──
-                _PawPill(),
-                const SizedBox(height: 20),
-              ],
-            ),
+              // ── Paw button at bottom center ──
+              Positioned(
+                bottom: 24,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: _PawButton(
+                    isOpen: _menuOpen,
+                    onTap: _toggleMenu,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -73,237 +138,183 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ── Top bar with status pills ─────────────────────────────────────────────────
-
-class _TopBar extends StatefulWidget {
-  final VoidCallback onProfile;
-  const _TopBar({required this.onProfile});
-
-  @override
-  State<_TopBar> createState() => _TopBarState();
-}
-
-class _TopBarState extends State<_TopBar> {
-  late final String _time;
-
-  @override
-  void initState() {
-    super.initState();
-    _time = DateFormat('HH:mm').format(DateTime.now());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _Pill(child: Text(_time,
-            style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700))),
-        const SizedBox(width: 7),
-        _Pill(child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.monetization_on_rounded, size: 13, color: AppColors.deepMoss),
-          const SizedBox(width: 4),
-          const Text('423', style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-        ])),
-        const SizedBox(width: 7),
-        _Pill(child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.mail_outline_rounded, size: 13, color: AppColors.deepMoss),
-          const SizedBox(width: 4),
-          const Text('2', style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-        ])),
-        const Spacer(),
-        _Pill(child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.wb_sunny_outlined, size: 13, color: AppColors.deepMoss),
-          const SizedBox(width: 4),
-          const Text('19°C', style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-        ])),
-        const SizedBox(width: 8),
-        GestureDetector(
-          onTap: widget.onProfile,
-          child: LiquidGlassCircle(
-            size: 40,
-            child: const Icon(Icons.person_rounded, size: 20, color: AppColors.deepMoss),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Pill extends StatelessWidget {
-  final Widget child;
-  const _Pill({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return LiquidGlassCard(
-      borderRadius: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      child: child,
-    );
-  }
-}
-
-// ── Pet home central area ─────────────────────────────────────────────────────
+// ── Pet home — frameless, full screen ────────────────────────────────────────
 
 class _PetHomeArea extends StatelessWidget {
   const _PetHomeArea();
 
   @override
   Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        LiquidGlassCircle(
+          size: 110,
+          child: const Icon(Icons.home_rounded, size: 52, color: AppColors.deepMoss),
+        ),
+        const SizedBox(height: 20),
+        const Text(
+          'Pet Home',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 26,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Top bar with status pills ─────────────────────────────────────────────────
+
+class _TopBar extends StatelessWidget {
+  final VoidCallback onProfile;
+  const _TopBar({required this.onProfile});
+
+  @override
+  Widget build(BuildContext context) {
+    final time = DateFormat('HH:mm').format(DateTime.now());
+    return Row(
+      children: [
+        _SPill(child: Text(time,
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w700))),
+        const SizedBox(width: 6),
+        _SPill(child: const Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.monetization_on_rounded, size: 12, color: AppColors.deepMoss),
+          SizedBox(width: 4),
+          Text('423', style: TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w600)),
+        ])),
+        const SizedBox(width: 6),
+        _SPill(child: const Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.mail_outline_rounded, size: 12, color: AppColors.deepMoss),
+          SizedBox(width: 4),
+          Text('2', style: TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w600)),
+        ])),
+        const Spacer(),
+        _SPill(child: const Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.wb_sunny_outlined, size: 12, color: AppColors.deepMoss),
+          SizedBox(width: 4),
+          Text('19°C', style: TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w600)),
+        ])),
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: onProfile,
+          child: LiquidGlassCircle(
+            size: 36,
+            child: const Icon(Icons.person_rounded, size: 18, color: AppColors.deepMoss),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SPill extends StatelessWidget {
+  final Widget child;
+  const _SPill({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
     return LiquidGlassCard(
-      borderRadius: 32,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      borderRadius: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      child: child,
+    );
+  }
+}
+
+// ── Action bubbles ────────────────────────────────────────────────────────────
+
+class _ActionBubbles extends StatelessWidget {
+  final VoidCallback onChat;
+  final VoidCallback onClose;
+
+  const _ActionBubbles({required this.onChat, required this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      _BubbleItem(Icons.sports_esports_rounded, 'Games', () {}),
+      _BubbleItem(Icons.favorite_rounded, 'Buddy', () {}),
+      _BubbleItem(Icons.chat_bubble_rounded, 'Chat', onChat),
+      _BubbleItem(Icons.lunch_dining_rounded, 'Food', () {}),
+      _BubbleItem(Icons.storefront_rounded, 'Shop', () {}),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: items.map((item) => _FloatingBubble(item: item)).toList(),
+      ),
+    );
+  }
+}
+
+class _BubbleItem {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const _BubbleItem(this.icon, this.label, this.onTap);
+}
+
+class _FloatingBubble extends StatelessWidget {
+  final _BubbleItem item;
+  const _FloatingBubble({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: item.onTap,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Pet home icon
           LiquidGlassCircle(
-            size: 96,
-            child: const Icon(Icons.home_rounded, size: 46, color: AppColors.deepMoss),
+            size: 58,
+            child: Icon(item.icon, size: 26, color: AppColors.deepMoss),
           ),
-          const SizedBox(height: 16),
-          const Text(
-            'Pet Home',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.3,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Mood: Excellent 😊',
-            style: TextStyle(
+          const SizedBox(height: 6),
+          Text(
+            item.label,
+            style: const TextStyle(
               color: AppColors.textSecondary,
-              fontSize: 14,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 24),
-          const _StatusBar(label: 'Hunger', value: 0.75,
-              color: AppColors.liquidGreen, icon: Icons.restaurant_rounded),
-          const SizedBox(height: 10),
-          const _StatusBar(label: 'Happiness', value: 0.88,
-              color: AppColors.deepMoss, icon: Icons.favorite_rounded),
-          const SizedBox(height: 10),
-          const _StatusBar(label: 'Energy', value: 0.60,
-              color: AppColors.softJade, icon: Icons.bolt_rounded),
         ],
       ),
     );
   }
 }
 
-class _StatusBar extends StatelessWidget {
-  final String label;
-  final double value;
-  final Color color;
-  final IconData icon;
+// ── Paw button ────────────────────────────────────────────────────────────────
 
-  const _StatusBar({
-    required this.label,
-    required this.value,
-    required this.color,
-    required this.icon,
-  });
+class _PawButton extends StatelessWidget {
+  final bool isOpen;
+  final VoidCallback onTap;
+  const _PawButton({required this.isOpen, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 15, color: color),
-        const SizedBox(width: 8),
-        SizedBox(
-          width: 72,
-          child: Text(label,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 12,
-                  fontWeight: FontWeight.w500)),
-        ),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: value,
-              minHeight: 7,
-              backgroundColor: AppColors.frostedSage,
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: LiquidGlassCard(
+        borderRadius: 50,
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: Icon(
+            isOpen ? Icons.close_rounded : Icons.pets_rounded,
+            key: ValueKey(isOpen),
+            size: 26,
+            color: AppColors.deepMoss,
           ),
         ),
-        const SizedBox(width: 8),
-        Text('${(value * 100).toInt()}%',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 11,
-                fontWeight: FontWeight.w600)),
-      ],
-    );
-  }
-}
-
-// ── 5 action circles row ─────────────────────────────────────────────────────
-
-class _ActionRow extends StatelessWidget {
-  final VoidCallback onChat;
-  const _ActionRow({required this.onChat});
-
-  @override
-  Widget build(BuildContext context) {
-    final items = [
-      _ActionItem(Icons.extension_rounded, 'Games', () {}),
-      _ActionItem(Icons.pets_rounded, 'Buddy', () {}),
-      _ActionItem(Icons.smart_toy_rounded, 'Conversate', onChat),
-      _ActionItem(Icons.restaurant_rounded, 'Food', () {}),
-      _ActionItem(Icons.shopping_bag_outlined, 'Shop', () {}),
-    ];
-
-    return LiquidGlassCard(
-      borderRadius: 28,
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: items.map((item) {
-          return GestureDetector(
-            onTap: item.onTap,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LiquidGlassCircle(
-                  size: 56,
-                  child: Icon(item.icon, size: 24, color: AppColors.deepMoss),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  item.label,
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
       ),
-    );
-  }
-}
-
-class _ActionItem {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  const _ActionItem(this.icon, this.label, this.onTap);
-}
-
-// ── Big paw pill ─────────────────────────────────────────────────────────────
-
-class _PawPill extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return LiquidGlassCard(
-      borderRadius: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 16),
-      child: const Icon(Icons.pets_rounded, size: 30, color: AppColors.deepMoss),
     );
   }
 }
@@ -334,13 +345,13 @@ class _ProfileSheet extends StatelessWidget {
             const SizedBox(height: 20),
             LiquidGlassCircle(
               size: 80,
-              child: Icon(Icons.person_rounded, size: 40, color: AppColors.deepMoss),
+              child: const Icon(Icons.person_rounded, size: 40, color: AppColors.deepMoss),
             ),
             const SizedBox(height: 14),
-            Text('My Profile',
+            const Text('My Profile',
                 style: TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
-            Text('Soul Pet user',
+            const Text('Soul Pet user',
                 style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
             const SizedBox(height: 28),
             _SheetItem(icon: Icons.settings_outlined, label: 'Settings',
@@ -370,7 +381,7 @@ class _ProfileSheet extends StatelessWidget {
                   children: [
                     Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
                     const SizedBox(width: 10),
-                    Text('Sign Out',
+                    const Text('Sign Out',
                         style: TextStyle(color: AppColors.error, fontSize: 15, fontWeight: FontWeight.w600)),
                   ],
                 ),
@@ -401,9 +412,9 @@ class _SheetItem extends StatelessWidget {
             Icon(icon, color: AppColors.deepMoss, size: 22),
             const SizedBox(width: 14),
             Text(label,
-                style: TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500)),
+                style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500)),
             const Spacer(),
-            Icon(Icons.chevron_right_rounded, color: AppColors.textHint, size: 20),
+            const Icon(Icons.chevron_right_rounded, color: AppColors.textHint, size: 20),
           ],
         ),
       ),
