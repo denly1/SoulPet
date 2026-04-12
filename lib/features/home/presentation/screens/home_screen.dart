@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
 import 'package:soulpet/core/di/injection.dart';
+import 'package:soulpet/core/l10n/locale_provider.dart';
+import 'package:soulpet/core/l10n/s.dart';
 import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/data/datasources/local/auth_local_datasource.dart';
 import 'package:soulpet/shared/widgets/liquid_glass.dart';
@@ -24,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+    LocaleProvider.instance.addListener(_onLocaleChanged);
     _menuAnim = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 280),
@@ -37,9 +40,12 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
+    LocaleProvider.instance.removeListener(_onLocaleChanged);
     _menuAnim.dispose();
     super.dispose();
   }
+
+  void _onLocaleChanged() => setState(() {});
 
   void _toggleMenu() {
     setState(() => _menuOpen = !_menuOpen);
@@ -153,8 +159,8 @@ class _PetHomeArea extends StatelessWidget {
           child: const Icon(Icons.home_rounded, size: 52, color: AppColors.deepMoss),
         ),
         const SizedBox(height: 20),
-        const Text(
-          'Pet Home',
+        Text(
+          S.petHome,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 26,
@@ -236,11 +242,11 @@ class _ActionBubbles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      _BubbleItem(Icons.sports_esports_rounded, 'Games', () {}),
-      _BubbleItem(Icons.favorite_rounded, 'Buddy', () {}),
-      _BubbleItem(Icons.chat_bubble_rounded, 'Chat', onChat),
-      _BubbleItem(Icons.lunch_dining_rounded, 'Food', () {}),
-      _BubbleItem(Icons.storefront_rounded, 'Shop', () {}),
+      _BubbleItem(Icons.sports_esports_rounded, S.games, () {}),
+      _BubbleItem(Icons.favorite_rounded, S.buddy, () {}),
+      _BubbleItem(Icons.chat_bubble_rounded, S.chat, onChat),
+      _BubbleItem(Icons.lunch_dining_rounded, S.food, () {}),
+      _BubbleItem(Icons.storefront_rounded, S.shop, () {}),
     ];
 
     return Padding(

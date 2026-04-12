@@ -5,6 +5,9 @@ import 'package:soulpet/core/di/injection.dart';
 import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/core/utils/validators.dart';
 import 'package:soulpet/domain/usecases/auth/register_usecase.dart';
+import 'package:soulpet/core/l10n/locale_provider.dart';
+import 'package:soulpet/core/l10n/s.dart';
+import 'package:soulpet/shared/widgets/lang_toggle.dart';
 import 'package:soulpet/shared/widgets/sp_snackbar.dart';
 import 'package:soulpet/shared/widgets/liquid_glass.dart';
 
@@ -22,6 +25,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
   bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    LocaleProvider.instance.addListener(_onLocaleChanged);
+  }
+
+  void _onLocaleChanged() => setState(() {});
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
@@ -41,6 +52,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
+    LocaleProvider.instance.removeListener(_onLocaleChanged);
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -56,8 +68,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         height: double.infinity,
         decoration: const BoxDecoration(gradient: AppColors.warmGradient),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Form(
               key: _formKey,
               child: Column(
@@ -94,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Name field
                         _AuthField(
                           controller: _usernameController,
-                          hint: 'Enter your name',
+                            hint: S.username,
                           validator: Validators.username,
                           icon: Icons.person_outline_rounded,
                         ),
@@ -103,7 +117,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Email field
                         _AuthField(
                           controller: _emailController,
-                          hint: 'Enter your email',
+                            hint: S.email,
                           validator: Validators.email,
                           icon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,
@@ -113,7 +127,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Password field
                         _AuthField(
                           controller: _passwordController,
-                          hint: 'Password',
+                            hint: S.password,
                           validator: Validators.password,
                           icon: Icons.lock_outline_rounded,
                           obscureText: _obscurePassword,
@@ -127,7 +141,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         // Sign Up button
                         _PrimaryButton(
-                          label: 'Sign Up',
+                          label: S.register,
                           loading: _loading,
                           onTap: _register,
                         ),
@@ -138,7 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Already have an account? ',
+                              S.haveAccount,
                               style: TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 14,
@@ -147,7 +161,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             GestureDetector(
                               onTap: () => context.go(AppRoutes.login),
                               child: Text(
-                                'Sign In',
+                                S.login,
                                 style: TextStyle(
                                   color: AppColors.deepMoss,
                                   fontSize: 14,
@@ -168,7 +182,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   // ── Sign up with label ──
                   Text(
-                    'Sign up with',
+                    S.orContinueWith,
                     style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 13,
@@ -198,6 +212,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ],
               ),
             ),
+              ),
+              const Positioned(
+                top: 12,
+                right: 24,
+                child: LangToggle(),
+              ),
+            ],
           ),
         ),
       ),

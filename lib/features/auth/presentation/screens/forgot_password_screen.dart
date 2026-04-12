@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
-import 'package:soulpet/core/constants/app_strings.dart';
 import 'package:soulpet/core/di/injection.dart';
+import 'package:soulpet/core/l10n/locale_provider.dart';
+import 'package:soulpet/core/l10n/s.dart';
 import 'package:soulpet/core/utils/validators.dart';
 import 'package:soulpet/domain/usecases/auth/reset_password_usecase.dart';
+import 'package:soulpet/shared/widgets/lang_toggle.dart';
 import 'package:soulpet/shared/widgets/sp_snackbar.dart';
 import 'package:soulpet/shared/widgets/liquid_glass.dart';
 
@@ -20,6 +22,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
   bool _loading = false;
   bool _sent = false;
+
+  @override
+  void initState() {
+    super.initState();
+    LocaleProvider.instance.addListener(_onLocaleChanged);
+  }
+
+  void _onLocaleChanged() => setState(() {});
 
   Future<void> _sendReset() async {
     if (!_formKey.currentState!.validate()) return;
@@ -40,6 +50,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   void dispose() {
+    LocaleProvider.instance.removeListener(_onLocaleChanged);
     _emailController.dispose();
     super.dispose();
   }
@@ -52,10 +63,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         height: double.infinity,
         decoration: const BoxDecoration(gradient: AppColors.warmGradient),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            child: Column(
-              children: [
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28),
+                child: Column(
+                  children: [
                 const SizedBox(height: 24),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -70,7 +83,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     size: 56, color: AppColors.deepMoss),
                 const SizedBox(height: 20),
                 Text(
-                  AppStrings.resetPassword,
+                  S.resetPassword,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 26,
@@ -80,8 +93,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 const SizedBox(height: 8),
                 Text(
                   _sent
-                      ? 'Письмо отправлено! Проверь свой email.'
-                      : AppStrings.resetPasswordDesc,
+                      ? S.resetEmailSent
+                      : S.resetPasswordDesc,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppColors.textSecondary,
@@ -123,7 +136,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                         color: Colors.white,
                                       ),
                                     )
-                                  : Text(AppStrings.sendResetLink),
+                                  : Text(S.sendResetLink),
                             ),
                           ),
                         ],
@@ -141,7 +154,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             color: AppColors.success),
                         const SizedBox(width: 12),
                         Text(
-                          AppStrings.resetEmailSent,
+                          S.resetEmailSent,
                           style: TextStyle(
                             color: AppColors.success,
                             fontWeight: FontWeight.w600,
@@ -150,8 +163,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ],
                     ),
                   ),
-              ],
-            ),
+                  ],
+                ),
+              ),
+              const Positioned(
+                top: 12,
+                right: 24,
+                child: LangToggle(),
+              ),
+            ],
           ),
         ),
       ),

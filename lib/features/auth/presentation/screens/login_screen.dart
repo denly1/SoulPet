@@ -6,6 +6,9 @@ import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/core/utils/validators.dart';
 import 'package:soulpet/domain/usecases/auth/login_usecase.dart';
 import 'package:soulpet/shared/widgets/sp_snackbar.dart';
+import 'package:soulpet/core/l10n/locale_provider.dart';
+import 'package:soulpet/core/l10n/s.dart';
+import 'package:soulpet/shared/widgets/lang_toggle.dart';
 import 'package:soulpet/shared/widgets/liquid_glass.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -21,6 +24,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
   bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    LocaleProvider.instance.addListener(_onLocaleChanged);
+  }
+
+  void _onLocaleChanged() => setState(() {});
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
@@ -39,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    LocaleProvider.instance.removeListener(_onLocaleChanged);
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -53,9 +65,11 @@ class _LoginScreenState extends State<LoginScreen> {
         height: double.infinity,
         decoration: const BoxDecoration(gradient: AppColors.warmGradient),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Form(
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -91,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Email field
                         _AuthField(
                           controller: _emailController,
-                          hint: 'Enter your email',
+                          hint: S.email,
                           validator: Validators.email,
                           icon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,
@@ -101,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Password field
                         _AuthField(
                           controller: _passwordController,
-                          hint: 'Password',
+                          hint: S.password,
                           validator: Validators.password,
                           icon: Icons.lock_outline_rounded,
                           obscureText: _obscurePassword,
@@ -120,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             onTap: () =>
                                 context.push(AppRoutes.forgotPassword),
                             child: Text(
-                              'Forgot password?',
+                              S.forgotPassword,
                               style: TextStyle(
                                 color: AppColors.deepMoss,
                                 fontSize: 13,
@@ -133,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         // Sign In button
                         _PrimaryButton(
-                          label: 'Sign In',
+                          label: S.login,
                           loading: _loading,
                           onTap: _login,
                         ),
@@ -144,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "Don't have an account? ",
+                              S.noAccount,
                               style: TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 14,
@@ -153,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             GestureDetector(
                               onTap: () => context.go(AppRoutes.register),
                               child: Text(
-                                'Sign Up',
+                                S.register,
                                 style: TextStyle(
                                   color: AppColors.deepMoss,
                                   fontSize: 14,
@@ -174,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // ── Sign in with label ──
                   Text(
-                    'Sign in with',
+                    S.orContinueWith,
                     style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 13,
@@ -204,6 +218,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
+          ),
+              const Positioned(
+                top: 12,
+                right: 24,
+                child: LangToggle(),
+              ),
+            ],
           ),
         ),
       ),
