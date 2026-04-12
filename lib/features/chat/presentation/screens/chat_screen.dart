@@ -1,4 +1,3 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -153,8 +152,15 @@ class _MessageRow extends StatelessWidget {
     final maxW = MediaQuery.of(context).size.width * 0.72;
     final isUser = msg.isUser;
 
+    // Отступ снаружи: 10 со стороны хвостика (для его выступа), 6 с другой
+    final outerPadding = EdgeInsets.only(
+      left: isUser ? 6 : 10,
+      right: isUser ? 10 : 6,
+      bottom: showTail ? 8 : 2,
+    );
+
     return Padding(
-      padding: EdgeInsets.only(bottom: showTail ? 10 : 2),
+      padding: outerPadding,
       child: Row(
         mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -185,81 +191,76 @@ class _MessageRow extends StatelessWidget {
 
 // ── iMessage bubble ──────────────────────────────────────────────────────────
 
-const double _kRadius = 18.0;
+const double _kR = 18.0;
 
-/// Строит путь пузыря iMessage с хвостиком.
-/// [isMe]=true → хвостик справа внизу (зелёный, пользователь)
-/// [isMe]=false → хвостик слева внизу (серый, питомец)
+/// Строит путь пузыря iMessage 1-в-1.
+/// Хвостик: плавный переход стенки → острый кончик → вогнутый возврат.
 Path _buildBubblePath(Size size, {required bool isMe, required bool showTail}) {
-  final double r = _kRadius;
+  final double r = _kR;
   final double w = size.width;
   final double h = size.height;
   final p = Path();
 
   if (isMe) {
-    // ═══════════════════════════════════════════════════════════════════════
-    // ПРАВЫЙ пузырь (пользователь): хвостик справа внизу
-    // ═══════════════════════════════════════════════════════════════════════
+    // ── Правый пузырь (пользователь) ──
     p.moveTo(r, 0);
     p.lineTo(w - r, 0);
     p.arcToPoint(Offset(w, r), radius: Radius.circular(r));
-    
+
     if (showTail) {
-      // Правая сторона до хвостика
-      p.lineTo(w, h - 6);
-      // Хвостик: кривая Безье вправо-вниз
+      // Правая стенка до хвостика
+      p.lineTo(w, h - r);
+      // Плавный переход стенки в хвостик
       p.cubicTo(
-        w, h - 2,        // control point 1
-        w + 4, h + 2,    // control point 2
-        w + 10, h + 2,   // end point (кончик хвоста)
+        w, h - 4,           // cp1: продолжение стенки
+        w, h + 0.5,         // cp2: чуть ниже дна
+        w + 8, h + 2,       // кончик хвоста
       );
-      // Возврат к нижней части пузыря
+      // Вогнутый возврат от кончика к дну пузыря
       p.cubicTo(
-        w + 2, h + 2,    // control point 1
-        w - 4, h,        // control point 2
-        w - r, h,        // end point
+        w + 3, h + 1,       // cp1: рядом с кончиком
+        w - 4, h + 0.5,     // cp2: к дну с вогнутостью
+        w - r, h,           // точка на дне
       );
     } else {
       p.lineTo(w, h - r);
       p.arcToPoint(Offset(w - r, h), radius: Radius.circular(r));
     }
-    
-    // Нижняя и левая стороны
+
+    // Дно и левая сторона
     p.lineTo(r, h);
     p.arcToPoint(Offset(0, h - r), radius: Radius.circular(r));
     p.lineTo(0, r);
     p.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
-    
+
   } else {
-    // ═══════════════════════════════════════════════════════════════════════
-    // ЛЕВЫЙ пузырь (питомец): хвостик слева внизу
-    // ═══════════════════════════════════════════════════════════════════════
+    // ── Левый пузырь (питомец) ──
     p.moveTo(r, 0);
     p.lineTo(w - r, 0);
     p.arcToPoint(Offset(w, r), radius: Radius.circular(r));
     p.lineTo(w, h - r);
     p.arcToPoint(Offset(w - r, h), radius: Radius.circular(r));
-    
+
     if (showTail) {
-      // Нижняя сторона до хвостика
+      // Дно до хвостика
       p.lineTo(r, h);
-      // Хвостик: кривая Безье влево-вниз
+      // Плавный переход дна в хвостик
       p.cubicTo(
-        4, h,            // control point 1
-        -2, h + 2,       // control point 2
-        -10, h + 2,      // end point (кончик хвоста)
+        4, h + 0.5,         // cp1: к краю дна
+        0, h + 0.5,         // cp2: чуть ниже дна
+        -8, h + 2,          // кончик хвоста
       );
-      // Возврат к левой стороне пузыря
+      // Вогнутый возврат от кончика к стенке
       p.cubicTo(
-        -2, h + 2,       // control point 1
-        0, h - 2,        // control point 2
-        0, h - 6,        // end point
+        -3, h + 1,          // cp1: рядом с кончиком
+        0, h - 4,           // cp2: к стенке с вогнутостью
+        0, h - r,           // точка на стенке
       );
     } else {
       p.lineTo(r, h);
       p.arcToPoint(Offset(0, h - r), radius: Radius.circular(r));
     }
-    
+
     // Левая сторона
     p.lineTo(0, r);
     p.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
@@ -280,89 +281,80 @@ class _IMessageBubble extends StatelessWidget {
     required this.showTail,
   });
 
-  // Точные цвета iMessage
-  static const Color _userBubbleColor = Color(0xFF34C759); // Зелёный iMessage
-  static const Color _petBubbleColor = Color(0xFFE9E9EB);  // Светло-серый iMessage
-
   @override
   Widget build(BuildContext context) {
-    // Отступы внутри пузыря
     final content = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       child: _BubbleContent(msg: msg, isUser: isUser),
     );
 
-    // Добавляем margin для хвостика
-    final margin = EdgeInsets.only(
-      left: isUser ? 0 : (showTail ? 10 : 0),
-      right: isUser ? (showTail ? 10 : 0) : 0,
+    // Без BackdropFilter на каждом пузыре — только paint
+    return CustomPaint(
+      painter: _GlassBubblePainter(
+        isUser: isUser,
+        showTail: showTail,
+      ),
+      child: content,
     );
-
-    if (isUser) {
-      return Padding(
-        padding: margin,
-        child: CustomPaint(
-          painter: _BubblePainter(
-            isUser: true,
-            showTail: showTail,
-            color: _userBubbleColor,
-          ),
-          child: content,
-        ),
-      );
-    } else {
-      // Питомец: светло-серый пузырь
-      return Padding(
-        padding: margin,
-        child: CustomPaint(
-          painter: _BubblePainter(
-            isUser: false,
-            showTail: showTail,
-            color: _petBubbleColor,
-          ),
-          child: content,
-        ),
-      );
-    }
   }
 }
 
-class _BubblePainter extends CustomPainter {
+class _GlassBubblePainter extends CustomPainter {
   final bool isUser;
   final bool showTail;
-  final Color color;
 
-  const _BubblePainter({
+  const _GlassBubblePainter({
     required this.isUser,
     required this.showTail,
-    required this.color,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final path = _buildBubblePath(size, isMe: isUser, showTail: showTail);
-    // Заливка без тени (как в iMessage)
-    canvas.drawPath(path, Paint()..color = color);
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    // Лёгкая тень для глубины
+    canvas.drawShadow(
+      path,
+      const Color(0x1A000000),
+      6,
+      false,
+    );
+
+    // Оба пузыря — чистый прозрачный white glass
+    final gradient = LinearGradient(
+      colors: [
+        Colors.white.withValues(alpha: 0.55),
+        Colors.white.withValues(alpha: 0.35),
+        Colors.white.withValues(alpha: 0.20),
+      ],
+      stops: const [0.0, 0.55, 1.0],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..shader = gradient.createShader(rect)
+        ..style = PaintingStyle.fill,
+    );
+
+    // Белая обводка для обоих
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.70)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2,
+    );
   }
 
   @override
-  bool shouldRepaint(_BubblePainter o) =>
-      o.isUser != isUser || o.showTail != showTail || o.color != color;
+  bool shouldRepaint(_GlassBubblePainter o) =>
+      o.isUser != isUser || o.showTail != showTail;
 }
 
-class _BubbleClipper extends CustomClipper<Path> {
-  final bool isMe;
-  final bool showTail;
-  const _BubbleClipper({required this.isMe, required this.showTail});
-
-  @override
-  Path getClip(Size size) =>
-      _buildBubblePath(size, isMe: isMe, showTail: showTail);
-
-  @override
-  bool shouldReclip(_BubbleClipper o) =>
-      o.showTail != showTail || o.isMe != isMe;
-}
 
 class _BubbleContent extends StatelessWidget {
   final _Message msg;
@@ -371,23 +363,15 @@ class _BubbleContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Цвета текста как в iMessage
-    final textColor = isUser ? Colors.white : Colors.black;
-    final timeColor = isUser ? Colors.white70 : Colors.black54;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          msg.text,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 16,
-            height: 1.3,
-          ),
-        ),
-      ],
+    return Text(
+      msg.text,
+      style: TextStyle(
+        color: AppColors.textPrimary,
+        fontSize: 16.5,
+        height: 1.25,
+        letterSpacing: -0.2,
+        fontWeight: FontWeight.w500,
+      ),
     );
   }
 }
