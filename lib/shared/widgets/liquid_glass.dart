@@ -18,9 +18,6 @@ LinearGradient _glassGradient() => LinearGradient(
       end: Alignment.bottomRight,
     );
 
-// Top-left highlight refraction line
-Color _glassHighlight() => const Color(0xFFFFFFFF).withValues(alpha: 0.80);
-
 // Border
 Color _glassBorder() => const Color(0xFFFFFFFF).withValues(alpha: 0.60);
 
@@ -46,6 +43,7 @@ List<BoxShadow> _glassShadow() => [
 class LiquidGlassCard extends StatelessWidget {
   final Widget child;
   final double borderRadius;
+  final BorderRadius? customRadius;
   final EdgeInsetsGeometry padding;
   final bool dense;
 
@@ -53,13 +51,14 @@ class LiquidGlassCard extends StatelessWidget {
     super.key,
     required this.child,
     this.borderRadius = 24,
+    this.customRadius,
     this.padding = const EdgeInsets.all(20),
     this.dense = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final r = BorderRadius.circular(borderRadius);
+    final r = customRadius ?? BorderRadius.circular(borderRadius);
     final sigma = dense ? _kBlurSmall : _kBlur;
 
     return Container(
@@ -79,13 +78,6 @@ class LiquidGlassCard extends StatelessWidget {
               border: Border.all(
                 color: _glassBorder(),
                 width: 1.0,
-              ),
-            ),
-            foregroundDecoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: _glassHighlight(), width: 1.2),
-                left: BorderSide(
-                    color: _glassHighlight().withValues(alpha: 0.45), width: 0.8),
               ),
             ),
             child: child,
@@ -160,6 +152,148 @@ class LiquidGlassCircle extends StatelessWidget {
     }
     return content;
   }
+}
+
+// ─── LiquidGlassBubble ──────────────────────────────────────────────────────
+
+/// Chat bubble with a tail — one unified frosted-glass shape.
+/// [tailRight] = tail on bottom-right (user). false = bottom-left (pet).
+class LiquidGlassBubble extends StatelessWidget {
+  final Widget child;
+  final bool tailRight;
+
+  const LiquidGlassBubble({
+    super.key,
+    required this.child,
+    this.tailRight = false,
+  });
+
+  static const double _r = 18.0;
+  static const double _tailW = 10.0;
+  static const double _tailH = 10.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF000000).withValues(alpha: 0.07),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipPath(
+        clipper: _BubbleClipper(r: _r, tailW: _tailW, tailH: _tailH, tailRight: tailRight),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: _kBlur, sigmaY: _kBlur),
+          child: CustomPaint(
+            painter: _BubblePainter(r: _r, tailW: _tailW, tailH: _tailH, tailRight: tailRight),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                tailRight ? 14 : 14,
+                11,
+                tailRight ? 14 : 14,
+                11 + _tailH,
+              ),
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BubbleClipper extends CustomClipper<Path> {
+  final double r, tailW, tailH;
+  final bool tailRight;
+  const _BubbleClipper({required this.r, required this.tailW, required this.tailH, required this.tailRight});
+
+  @override
+  Path getClip(Size s) => _bubblePath(s, r, tailW, tailH, tailRight);
+
+  @override
+  bool shouldReclip(_BubbleClipper o) => false;
+}
+
+class _BubblePainter extends CustomPainter {
+  final double r, tailW, tailH;
+  final bool tailRight;
+  const _BubblePainter({required this.r, required this.tailW, required this.tailH, required this.tailRight});
+
+  @override
+  void paint(Canvas canvas, Size s) {
+    final path = _bubblePath(s, r, tailW, tailH, tailRight);
+    final rect = Rect.fromLTWH(0, 0, s.width, s.height);
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..shader = const LinearGradient(
+          colors: [Color(0x85FFFFFF), Color(0x4DFFFFFF), Color(0x2EFFFFFF)],
+          stops: [0.0, 0.55, 1.0],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(rect)
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = const Color(0x99FFFFFF)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_BubblePainter o) => false;
+}
+
+/// Builds the bubble+tail path.
+/// [tailRight] = tail on bottom-right (user). false = bottom-left (pet).
+Path _bubblePath(Size s, double r, double tailW, double tailH, bool tailRight) {
+  final w = s.width;
+  final h = s.height;
+  final tailY = h - tailH - 4; // Tail anchor position from bottom
+
+  final p = Path();
+
+  if (tailRight) {
+    // User bubble (right tail)
+    p.moveTo(r, 0);
+    p.lineTo(w - r, 0);
+    p.arcToPoint(Offset(w, r), radius: Radius.circular(r));
+    p.lineTo(w, tailY);
+    // Tail pointing right
+    p.lineTo(w + tailW, tailY + tailH / 2); // tip
+    p.lineTo(w, tailY + tailH);
+    p.lineTo(w, h - r);
+    p.arcToPoint(Offset(w - r, h), radius: Radius.circular(r));
+    p.lineTo(r, h);
+    p.arcToPoint(Offset(0, h - r), radius: Radius.circular(r));
+    p.lineTo(0, r);
+    p.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
+  } else {
+    // Pet bubble (left tail)
+    p.moveTo(r + tailW, 0);
+    p.lineTo(w - r, 0);
+    p.arcToPoint(Offset(w, r), radius: Radius.circular(r));
+    p.lineTo(w, h - r);
+    p.arcToPoint(Offset(w - r, h), radius: Radius.circular(r));
+    p.lineTo(r + tailW, h);
+    p.lineTo(r + tailW, tailY + tailH);
+    // Tail pointing left
+    p.lineTo(r, tailY + tailH / 2); // tip
+    p.lineTo(r + tailW, tailY);
+    p.lineTo(r + tailW, r);
+    p.arcToPoint(Offset(r + tailW + r, 0), radius: Radius.circular(r));
+  }
+
+  p.close();
+  return p;
 }
 
 // ─── LiquidGlassPill ────────────────────────────────────────────────────────

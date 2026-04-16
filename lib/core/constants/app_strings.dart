@@ -26,23 +26,23 @@ class AppStrings {
   static const String getStarted = 'Начать';
 
   // Auth
-  static const String login = 'Войти';
-  static const String register = 'Зарегистрироваться';
+  static const String login = 'Sign In';
+  static const String register = 'Create Account';
   static const String email = 'Email';
-  static const String password = 'Пароль';
-  static const String confirmPassword = 'Повторите пароль';
-  static const String username = 'Имя пользователя';
-  static const String forgotPassword = 'Забыли пароль?';
-  static const String noAccount = 'Нет аккаунта? ';
-  static const String haveAccount = 'Уже есть аккаунт? ';
-  static const String signInWithGoogle = 'Войти через Google';
-  static const String signInWithApple = 'Войти через Apple';
-  static const String orContinueWith = 'или продолжить с';
-  static const String resetPassword = 'Сброс пароля';
+  static const String password = 'Password';
+  static const String confirmPassword = 'Confirm Password';
+  static const String username = 'Username';
+  static const String forgotPassword = 'Forgot password?';
+  static const String noAccount = 'Don\'t have an account? ';
+  static const String haveAccount = 'Already have an account? ';
+  static const String signInWithGoogle = 'Sign in with Google';
+  static const String signInWithApple = 'Sign in with Apple';
+  static const String orContinueWith = 'or continue with';
+  static const String resetPassword = 'Reset Password';
   static const String resetPasswordDesc =
-      'Введите email и мы отправим ссылку для восстановления';
-  static const String sendResetLink = 'Отправить';
-  static const String resetEmailSent = 'Письмо отправлено';
+      'Enter your email and we will send you a reset link';
+  static const String sendResetLink = 'Send Reset Link';
+  static const String resetEmailSent = 'Email sent! Check your inbox.';
 
   // Pet test
   static const String petTestTitle = 'Найдём твоего питомца';
@@ -108,12 +108,12 @@ class AppStrings {
   static const String reward = 'Награда';
 
   // Errors
-  static const String networkError = 'Ошибка соединения';
-  static const String serverError = 'Ошибка сервера';
-  static const String unknownError = 'Что-то пошло не так';
-  static const String invalidEmail = 'Введите корректный email';
-  static const String weakPassword = 'Пароль слишком короткий (мин. 8 символов)';
-  static const String passwordMismatch = 'Пароли не совпадают';
-  static const String fieldRequired = 'Обязательное поле';
-  static const String nameTooShort = 'Имя слишком короткое';
+  static const String networkError = 'Connection error';
+  static const String serverError = 'Server error';
+  static const String unknownError = 'Something went wrong';
+  static const String invalidEmail = 'Enter a valid email';
+  static const String weakPassword = 'Password is too short (min. 8 characters)';
+  static const String passwordMismatch = 'Passwords do not match';
+  static const String fieldRequired = 'This field is required';
+  static const String nameTooShort = 'Name is too short';
 }
