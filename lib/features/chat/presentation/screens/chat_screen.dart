@@ -21,14 +21,14 @@ class _ChatScreenState extends State<ChatScreen> {
   final _scrollController = ScrollController();
 
   final List<_Message> _messages = [
-    _Message(text: 'Hey Buddy! How are you doing? What are you up to?', isUser: true, time: '10:24'),
-    _Message(text: 'Hi! 😊 I\'m doing great!\nI was resting after playing and napping a little.\nWaiting for you to write!', isUser: false, time: '10:25'),
-    _Message(text: 'How cute! Maybe we can play together?\nWhat would you like to do?', isUser: true, time: '10:26'),
-    _Message(text: 'Yay! I love playing with you! 🐾\nLet\'s play fetch - it\'s my favourite game!\nOr we can practice commands like "give paw"?', isUser: false, time: '10:27'),
-    _Message(text: 'Let\'s play fetch first, then practise commands. Deal?', isUser: true, time: '10:28'),
-    _Message(text: 'Perfect! I\'m already running for my ball! 🎾\nThank you so much for playing with me - I\'m having so much fun!', isUser: false, time: '10:28'),
-    _Message(text: 'You\'re the best, Buddy! 🥰', isUser: true, time: '10:29'),
-    _Message(text: 'Woof! 🐶 You\'re my absolute favourite too!\nI love you so much! ♡', isUser: false, time: '10:29'),
+    _Message(text: 'Hey! How are you?', isUser: true, time: '10:24'),
+    _Message(text: 'Hi! 😊 Doing great, just resting!', isUser: false, time: '10:25'),
+    _Message(text: 'Want to play together?', isUser: true, time: '10:26'),
+    _Message(text: 'Yay! 🐾 Fetch or commands?', isUser: false, time: '10:27'),
+    _Message(text: 'Fetch first, then commands!', isUser: true, time: '10:28'),
+    _Message(text: 'Perfect! 🎾 Running for the ball!', isUser: false, time: '10:28'),
+    _Message(text: 'You are the best! 🥰', isUser: true, time: '10:29'),
+    _Message(text: 'Woof! 🐶 Love you so much! ♡', isUser: false, time: '10:29'),
   ];
 
   void _sendMessage() {
@@ -77,7 +77,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
                   itemCount: _messages.length,
                   itemBuilder: (context, i) {
-                    final msg = _messages[i];
+                    final msg  = _messages[i];
                     final next = i < _messages.length - 1 ? _messages[i + 1] : null;
                     final showTail = next == null || next.isUser != msg.isUser;
                     return _MessageRow(msg: msg, showTail: showTail);
@@ -149,13 +149,14 @@ class _MessageRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxW = MediaQuery.of(context).size.width * 0.72;
+    final screenW = MediaQuery.of(context).size.width;
+    // Аватар 30 + зазор 16 + выступ хвостика 11 с каждой стороны
+    final maxW = screenW * 0.72;
     final isUser = msg.isUser;
 
-    // Отступ снаружи: 10 со стороны хвостика (для его выступа), 6 с другой
     final outerPadding = EdgeInsets.only(
-      left: isUser ? 6 : 10,
-      right: isUser ? 10 : 6,
+      left:   isUser ? 8 : 0,
+      right:  isUser ? 0 : 8,
       bottom: showTail ? 8 : 2,
     );
 
@@ -173,7 +174,8 @@ class _MessageRow extends StatelessWidget {
               )
             else
               const SizedBox(width: 30),
-            const SizedBox(width: 4),
+            // Зазор 3px воздух (хвостик уже компенсирован padding в _IMessageBubble)
+            const SizedBox(width: 3),
           ],
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: maxW),
@@ -191,82 +193,54 @@ class _MessageRow extends StatelessWidget {
 
 // ── iMessage bubble ──────────────────────────────────────────────────────────
 
-const double _kR = 18.0;
+const double _kTailOutset = 14.0;
 
-/// Строит путь пузыря iMessage 1-в-1.
-/// Хвостик: плавный переход стенки → острый кончик → вогнутый возврат.
 Path _buildBubblePath(Size size, {required bool isMe, required bool showTail}) {
-  final double r = _kR;
-  final double w = size.width;
-  final double h = size.height;
+  final w = size.width;
+  final h = size.height;
+  const double r = 20.0;
+  final t = _kTailOutset;
   final p = Path();
 
-  if (isMe) {
-    // ── Правый пузырь (пользователь) ──
-    p.moveTo(r, 0);
-    p.lineTo(w - r, 0);
-    p.arcToPoint(Offset(w, r), radius: Radius.circular(r));
-
-    if (showTail) {
-      // Правая стенка до хвостика
-      p.lineTo(w, h - r);
-      // Плавный переход стенки в хвостик
-      p.cubicTo(
-        w, h - 4,           // cp1: продолжение стенки
-        w, h + 0.5,         // cp2: чуть ниже дна
-        w + 8, h + 2,       // кончик хвоста
-      );
-      // Вогнутый возврат от кончика к дну пузыря
-      p.cubicTo(
-        w + 3, h + 1,       // cp1: рядом с кончиком
-        w - 4, h + 0.5,     // cp2: к дну с вогнутостью
-        w - r, h,           // точка на дне
-      );
-    } else {
-      p.lineTo(w, h - r);
-      p.arcToPoint(Offset(w - r, h), radius: Radius.circular(r));
-    }
-
-    // Дно и левая сторона
-    p.lineTo(r, h);
-    p.arcToPoint(Offset(0, h - r), radius: Radius.circular(r));
-    p.lineTo(0, r);
-    p.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
-
-  } else {
-    // ── Левый пузырь (питомец) ──
-    p.moveTo(r, 0);
-    p.lineTo(w - r, 0);
-    p.arcToPoint(Offset(w, r), radius: Radius.circular(r));
-    p.lineTo(w, h - r);
-    p.arcToPoint(Offset(w - r, h), radius: Radius.circular(r));
-
-    if (showTail) {
-      // Дно до хвостика
-      p.lineTo(r, h);
-      // Плавный переход дна в хвостик
-      p.cubicTo(
-        4, h + 0.5,         // cp1: к краю дна
-        0, h + 0.5,         // cp2: чуть ниже дна
-        -8, h + 2,          // кончик хвоста
-      );
-      // Вогнутый возврат от кончика к стенке
-      p.cubicTo(
-        -3, h + 1,          // cp1: рядом с кончиком
-        0, h - 4,           // cp2: к стенке с вогнутостью
-        0, h - r,           // точка на стенке
-      );
-    } else {
-      p.lineTo(r, h);
-      p.arcToPoint(Offset(0, h - r), radius: Radius.circular(r));
-    }
-
-    // Левая сторона
-    p.lineTo(0, r);
-    p.arcToPoint(Offset(r, 0), radius: Radius.circular(r));
+  if (!showTail) {
+    p.addRRect(RRect.fromLTRBR(0, 0, w, h, const Radius.circular(r)));
+    return p;
   }
 
-  p.close();
+  if (isMe) {
+    p.moveTo(r, 0);
+    p.lineTo(w - r, 0);
+    p.arcToPoint(Offset(w, r), radius: const Radius.circular(r));
+    // Правый бок вниз до стыка хвоста (~40%)
+    p.lineTo(w, h * 0.40);
+    // Длинная вогнутая кривая → кончик
+    p.cubicTo(w, h * 0.85, w + t * 0.7, h * 0.96, w + t, h);
+    // Плавный возврат к низу тела
+    p.cubicTo(w + t * 0.15, h, w + 1, h, w - 3, h);
+    // Низ
+    p.lineTo(r, h);
+    p.arcToPoint(Offset(0, h - r), radius: const Radius.circular(r));
+    p.lineTo(0, r);
+    p.arcToPoint(Offset(r, 0), radius: const Radius.circular(r));
+    p.close();
+  } else {
+    p.moveTo(r, 0);
+    p.lineTo(w - r, 0);
+    p.arcToPoint(Offset(w, r), radius: const Radius.circular(r));
+    p.lineTo(w, h - r);
+    p.arcToPoint(Offset(w - r, h), radius: const Radius.circular(r));
+    // Низ влево до стыка хвоста
+    p.lineTo(3, h);
+    // Плавный переход к кончику
+    p.cubicTo(-1, h, -t * 0.15, h, -t, h);
+    // Длинная вогнутая кривая вверх по левому боку
+    p.cubicTo(-t * 0.7, h * 0.96, 0, h * 0.85, 0, h * 0.40);
+    // Левый бок вверх
+    p.lineTo(0, r);
+    p.arcToPoint(Offset(r, 0), radius: const Radius.circular(r));
+    p.close();
+  }
+
   return p;
 }
 
@@ -283,19 +257,22 @@ class _IMessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final painter = _GlassBubblePainter(isUser: isUser, showTail: showTail);
     final content = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: _BubbleContent(msg: msg, isUser: isUser),
     );
 
-    // Без BackdropFilter на каждом пузыре — только paint
-    return CustomPaint(
-      painter: _GlassBubblePainter(
-        isUser: isUser,
-        showTail: showTail,
-      ),
-      child: content,
-    );
+    if (showTail) {
+      return Padding(
+        padding: EdgeInsets.only(
+          right: isUser ? _kTailOutset : 0,
+          left:  isUser ? 0 : _kTailOutset,
+        ),
+        child: CustomPaint(painter: painter, child: content),
+      );
+    }
+    return CustomPaint(painter: painter, child: content);
   }
 }
 
@@ -311,17 +288,12 @@ class _GlassBubblePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final path = _buildBubblePath(size, isMe: isUser, showTail: showTail);
-    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final rect  = Rect.fromLTWH(0, 0, size.width, size.height);
 
-    // Лёгкая тень для глубины
-    canvas.drawShadow(
-      path,
-      const Color(0x1A000000),
-      6,
-      false,
-    );
+    // Тень
+    canvas.drawShadow(path, const Color(0x1A000000), 4, false);
 
-    // Оба пузыря — чистый прозрачный white glass
+    // Стеклянный залив
     final gradient = LinearGradient(
       colors: [
         Colors.white.withValues(alpha: 0.55),
@@ -332,7 +304,6 @@ class _GlassBubblePainter extends CustomPainter {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
-
     canvas.drawPath(
       path,
       Paint()
@@ -340,13 +311,13 @@ class _GlassBubblePainter extends CustomPainter {
         ..style = PaintingStyle.fill,
     );
 
-    // Белая обводка для обоих
+    // Обводка
     canvas.drawPath(
       path,
       Paint()
         ..color = Colors.white.withValues(alpha: 0.70)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2,
+        ..strokeWidth = 1.0,
     );
   }
 
@@ -365,11 +336,11 @@ class _BubbleContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       msg.text,
-      style: TextStyle(
+      style: const TextStyle(
         color: AppColors.textPrimary,
-        fontSize: 16.5,
-        height: 1.25,
-        letterSpacing: -0.2,
+        fontSize: 15.0,
+        height: 1.3,
+        letterSpacing: -0.1,
         fontWeight: FontWeight.w500,
       ),
     );
