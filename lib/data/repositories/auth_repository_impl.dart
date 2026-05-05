@@ -1,4 +1,6 @@
 import 'package:dartz/dartz.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:soulpet/core/constants/app_constants.dart';
 import 'package:soulpet/core/errors/exceptions.dart';
 import 'package:soulpet/core/errors/failures.dart';
 import 'package:soulpet/core/network/dio_client.dart';
@@ -24,24 +26,36 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      // TODO: Replace with real API call in Block 4 (Network)
-      // Stub: local login simulation
-      await Future.delayed(const Duration(milliseconds: 800));
+      await Future.delayed(const Duration(milliseconds: 600));
 
-      final fakeUserId = const Uuid().v4();
-      final fakeAccess = 'access_${fakeUserId}';
-      final fakeRefresh = 'refresh_${fakeUserId}';
+      final prefs = await SharedPreferences.getInstance();
+      final savedEmail = prefs.getString(AppConstants.keyRegisteredEmail);
+      final savedPassword = prefs.getString(AppConstants.keyRegisteredPassword);
+
+      if (savedEmail == null ||
+          savedEmail.trim().toLowerCase() != email.trim().toLowerCase()) {
+        return const Left(AuthFailure('Аккаунт с таким email не найден'));
+      }
+
+      if (savedPassword == null || savedPassword != password) {
+        return const Left(AuthFailure('Неверный пароль'));
+      }
+
+      final savedUserId = prefs.getString(AppConstants.keyRegisteredUserId);
+      final userId = savedUserId ?? const Uuid().v4();
+      final fakeAccess = 'access_$userId';
+      final fakeRefresh = 'refresh_$userId';
 
       await localDatasource.saveTokens(
         accessToken: fakeAccess,
         refreshToken: fakeRefresh,
-        userId: fakeUserId,
+        userId: userId,
       );
 
       return Right(AuthTokens(
         accessToken: fakeAccess,
         refreshToken: fakeRefresh,
-        userId: fakeUserId,
+        userId: userId,
       ));
     } on AuthException catch (e) {
       return Left(AuthFailure(e.message));
@@ -57,23 +71,37 @@ class AuthRepositoryImpl implements AuthRepository {
     required String username,
   }) async {
     try {
-      // TODO: Replace with real API call in Block 4 (Network)
-      await Future.delayed(const Duration(milliseconds: 800));
+      await Future.delayed(const Duration(milliseconds: 600));
 
-      final fakeUserId = const Uuid().v4();
-      final fakeAccess = 'access_$fakeUserId';
-      final fakeRefresh = 'refresh_$fakeUserId';
+      final prefs = await SharedPreferences.getInstance();
+      final existingEmail = prefs.getString(AppConstants.keyRegisteredEmail);
+
+      if (existingEmail != null &&
+          existingEmail.trim().toLowerCase() == email.trim().toLowerCase()) {
+        return const Left(AuthFailure('Аккаунт с таким email уже существует'));
+      }
+
+      final newUserId = const Uuid().v4();
+
+      await prefs.setString(
+          AppConstants.keyRegisteredEmail, email.trim().toLowerCase());
+      await prefs.setString(AppConstants.keyRegisteredPassword, password);
+      await prefs.setString(AppConstants.keyRegisteredUsername, username.trim());
+      await prefs.setString(AppConstants.keyRegisteredUserId, newUserId);
+
+      final fakeAccess = 'access_$newUserId';
+      final fakeRefresh = 'refresh_$newUserId';
 
       await localDatasource.saveTokens(
         accessToken: fakeAccess,
         refreshToken: fakeRefresh,
-        userId: fakeUserId,
+        userId: newUserId,
       );
 
       return Right(AuthTokens(
         accessToken: fakeAccess,
         refreshToken: fakeRefresh,
-        userId: fakeUserId,
+        userId: newUserId,
       ));
     } catch (e) {
       return Left(UnknownFailure(e.toString()));
@@ -120,10 +148,16 @@ class AuthRepositoryImpl implements AuthRepository {
       if (userId == null) return const Left(AuthFailure());
 
       final now = DateTime.now();
+      final prefs = await SharedPreferences.getInstance();
+      final savedEmail =
+          prefs.getString(AppConstants.keyRegisteredEmail) ?? 'user@soulpet.app';
+      final savedUsername =
+          prefs.getString(AppConstants.keyRegisteredUsername) ?? 'SoulPetUser';
+
       return Right(UserModel(
         id: userId,
-        email: 'user@soulpet.app',
-        username: 'SoulPetUser',
+        email: savedEmail,
+        username: savedUsername,
         coins: 100,
         createdAt: now,
         updatedAt: now,

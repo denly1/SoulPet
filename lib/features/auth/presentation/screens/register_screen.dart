@@ -7,6 +7,7 @@ import 'package:soulpet/core/utils/validators.dart';
 import 'package:soulpet/domain/usecases/auth/register_usecase.dart';
 import 'package:soulpet/core/l10n/locale_provider.dart';
 import 'package:soulpet/core/l10n/s.dart';
+import 'package:soulpet/shared/widgets/auth_field.dart';
 import 'package:soulpet/shared/widgets/lang_toggle.dart';
 import 'package:soulpet/shared/widgets/sp_snackbar.dart';
 import 'package:soulpet/shared/widgets/liquid_glass.dart';
@@ -46,7 +47,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _loading = false);
     result.fold(
       (failure) => SpSnackbar.show(context, failure.message, isError: true),
-      (tokens) => context.go(AppRoutes.home),
+      // New user → fill in profile first, then the personality test.
+      (tokens) => context.go(AppRoutes.userProfile),
     );
   }
 
@@ -106,18 +108,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 22),
 
                         // Name field
-                        _AuthField(
+                        AuthField(
                           controller: _usernameController,
-                            hint: S.username,
+                          hint: S.username,
                           validator: Validators.username,
                           icon: Icons.person_outline_rounded,
+                          disableAutofill: true,
                         ),
                         const SizedBox(height: 12),
 
                         // Email field
-                        _AuthField(
+                        AuthField(
                           controller: _emailController,
-                            hint: S.email,
+                          hint: S.email,
                           validator: Validators.email,
                           icon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,
@@ -125,9 +128,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 12),
 
                         // Password field
-                        _AuthField(
+                        AuthField(
                           controller: _passwordController,
-                            hint: S.password,
+                          hint: S.password,
                           validator: Validators.password,
                           icon: Icons.lock_outline_rounded,
                           obscureText: _obscurePassword,
@@ -230,78 +233,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 // Shared auth widgets
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _AuthField extends StatelessWidget {
-  final TextEditingController controller;
-  final String hint;
-  final String? Function(String?)? validator;
-  final IconData icon;
-  final IconData? suffixIcon;
-  final VoidCallback? onSuffixTap;
-  final bool obscureText;
-  final TextInputType keyboardType;
-
-  const _AuthField({
-    required this.controller,
-    required this.hint,
-    required this.icon,
-    this.validator,
-    this.suffixIcon,
-    this.onSuffixTap,
-    this.obscureText = false,
-    this.keyboardType = TextInputType.text,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return LiquidGlassCard(
-      borderRadius: 50,
-      padding: EdgeInsets.zero,
-      child: TextFormField(
-        controller: controller,
-        validator: validator,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        style: TextStyle(
-          color: AppColors.textPrimary,
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-        ),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(color: AppColors.textHint, fontSize: 15),
-          prefixIcon: Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Icon(icon, color: AppColors.deepMoss, size: 20),
-          ),
-          suffixIcon: suffixIcon != null
-              ? GestureDetector(
-                  onTap: onSuffixTap,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Icon(suffixIcon, color: AppColors.textHint, size: 20),
-                  ),
-                )
-              : null,
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(color: AppColors.error, width: 1),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(color: AppColors.error, width: 1.5),
-          ),
-          filled: false,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        ),
-      ),
-    );
-  }
-}
-
 class _PrimaryButton extends StatelessWidget {
   final String label;
   final bool loading;
@@ -377,7 +308,7 @@ class _OrDivider extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'or',
+            S.or,
             style: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 13,

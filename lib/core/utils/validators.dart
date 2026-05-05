@@ -1,56 +1,56 @@
 import 'package:soulpet/core/constants/app_constants.dart';
-import 'package:soulpet/core/constants/app_strings.dart';
+import 'package:soulpet/core/l10n/s.dart';
 
 class Validators {
   Validators._();
 
   static String? email(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return AppStrings.fieldRequired;
+      return S.fieldRequired;
     }
     final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
     if (!emailRegex.hasMatch(value.trim())) {
-      return AppStrings.invalidEmail;
+      return S.invalidEmail;
     }
     return null;
   }
 
   static String? password(String? value) {
     if (value == null || value.isEmpty) {
-      return AppStrings.fieldRequired;
+      return S.fieldRequired;
     }
     if (value.length < AppConstants.minPasswordLength) {
-      return AppStrings.weakPassword;
+      return S.weakPassword;
     }
     return null;
   }
 
   static String? confirmPassword(String? value, String? password) {
     if (value == null || value.isEmpty) {
-      return AppStrings.fieldRequired;
+      return S.fieldRequired;
     }
     if (value != password) {
-      return AppStrings.passwordMismatch;
+      return S.passwordMismatch;
     }
     return null;
   }
 
   static String? username(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return AppStrings.fieldRequired;
+      return S.fieldRequired;
     }
     if (value.trim().length < 2) {
-      return AppStrings.nameTooShort;
+      return S.nameTooShort;
     }
     return null;
   }
 
   static String? petName(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return AppStrings.fieldRequired;
+      return S.fieldRequired;
     }
     if (value.trim().length < AppConstants.minPetNameLength) {
-      return AppStrings.nameTooShort;
+      return S.nameTooShort;
     }
     if (value.trim().length > AppConstants.maxPetNameLength) {
       return 'Имя слишком длинное (макс. ${AppConstants.maxPetNameLength} символов)';
@@ -60,7 +60,7 @@ class Validators {
 
   static String? required(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return AppStrings.fieldRequired;
+      return S.fieldRequired;
     }
     return null;
   }

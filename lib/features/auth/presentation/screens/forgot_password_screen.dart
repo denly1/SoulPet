@@ -6,6 +6,7 @@ import 'package:soulpet/core/l10n/locale_provider.dart';
 import 'package:soulpet/core/l10n/s.dart';
 import 'package:soulpet/core/utils/validators.dart';
 import 'package:soulpet/domain/usecases/auth/reset_password_usecase.dart';
+import 'package:soulpet/shared/widgets/auth_field.dart';
 import 'package:soulpet/shared/widgets/lang_toggle.dart';
 import 'package:soulpet/shared/widgets/sp_snackbar.dart';
 import 'package:soulpet/shared/widgets/liquid_glass.dart';
@@ -91,10 +92,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
+                if (!_sent)
                 Text(
-                  _sent
-                      ? S.resetEmailSent
-                      : S.resetPasswordDesc,
+                  S.resetPasswordDesc,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppColors.textSecondary,
@@ -106,27 +106,47 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 if (!_sent)
                   Form(
                     key: _formKey,
-                    child: LiquidGlassCard(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: Validators.email,
-                            decoration: const InputDecoration(
-                              hintText: 'example@mail.com',
-                              prefixIcon: Icon(
-                                  Icons.alternate_email_rounded,
-                                  color: AppColors.textHint),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          SizedBox(
+                    child: Column(
+                      children: [
+                        AuthField(
+                          controller: _emailController,
+                          hint: 'example@mail.com',
+                          icon: Icons.alternate_email_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: Validators.email,
+                        ),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                          onTap: _loading ? null : _sendReset,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
                             width: double.infinity,
                             height: 54,
-                            child: ElevatedButton(
-                              onPressed: _loading ? null : _sendReset,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              gradient: LinearGradient(
+                                colors: [
+                                  _loading
+                                      ? AppColors.deepMoss.withValues(alpha: 0.5)
+                                      : AppColors.deepMoss,
+                                  _loading
+                                      ? AppColors.liquidGreen.withValues(alpha: 0.5)
+                                      : AppColors.liquidGreen,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: _loading
+                                  ? []
+                                  : [
+                                      BoxShadow(
+                                        color: AppColors.deepMoss.withValues(alpha: 0.35),
+                                        blurRadius: 16,
+                                        offset: const Offset(0, 6),
+                                      ),
+                                    ],
+                            ),
+                            child: Center(
                               child: _loading
                                   ? const SizedBox(
                                       width: 22,
@@ -136,31 +156,45 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                         color: Colors.white,
                                       ),
                                     )
-                                  : Text(S.sendResetLink),
+                                  : Text(
+                                      S.sendResetLink,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  SizedBox(
+                    width: double.infinity,
+                    child: LiquidGlassCard(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                      dense: true,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.check_circle_outline_rounded,
+                              color: AppColors.deepMoss, size: 44),
+                          const SizedBox(height: 14),
+                          Text(
+                            S.resetEmailSent,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: AppColors.deepMoss,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  )
-                else
-                  LiquidGlassCard(
-                    padding: const EdgeInsets.all(24),
-                    dense: true,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.check_circle_outline_rounded,
-                            color: AppColors.success),
-                        const SizedBox(width: 12),
-                        Text(
-                          S.resetEmailSent,
-                          style: TextStyle(
-                            color: AppColors.success,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
                     ),
                   ),
                   ],

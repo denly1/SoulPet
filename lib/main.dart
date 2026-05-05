@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:soulpet/core/di/injection.dart';
 import 'package:soulpet/core/l10n/locale_provider.dart';
+import 'package:soulpet/core/profile/user_profile_provider.dart';
 import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/core/theme/app_theme.dart';
 
@@ -19,6 +20,9 @@ void main() async {
 
   await configureDependencies();
   await LiquidGlassWidgets.initialize();
+  // Pre-warm the user-profile cache so that gendered copy is correct on the
+  // very first frame after the splash.
+  await UserProfileProvider.instance.load();
 
   runApp(const SoulPetApp());
 }

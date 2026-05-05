@@ -12,6 +12,24 @@ class AppConstants {
   static const String keyPetTestDone = 'pet_test_done';
   static const String keySelectedHouseId = 'selected_house_id';
 
+  // Local auth credentials (stub mode — no real API yet)
+  static const String keyRegisteredEmail = 'registered_email';
+  static const String keyRegisteredPassword = 'registered_password';
+  static const String keyRegisteredUsername = 'registered_username';
+  static const String keyRegisteredUserId = 'registered_user_id';
+
+  // User profile (collected after registration / first login)
+  static const String keyUserProfileDone = 'user_profile_done';
+  static const String keyUserGender = 'user_gender';
+  static const String keyUserAge = 'user_age';
+  static const String keyUserNickname = 'user_nickname';
+
+  // Profile bounds
+  static const int minNicknameLength = 2;
+  static const int maxNicknameLength = 24;
+  static const int minUserAge = 8;
+  static const int maxUserAge = 120;
+
   // API
   static const String baseUrl = 'https://api.soulpet.app/v1';
   static const int connectTimeout = 15000;

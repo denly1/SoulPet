@@ -1,46 +1,97 @@
+import 'package:flutter/material.dart';
+import 'package:soulpet/core/l10n/pet_test_strings.dart';
 import 'package:soulpet/domain/entities/pet_entity.dart';
+
+// Identifier for which answer option a user picked: A or B.
+enum TestOption { a, b }
+
+extension TestOptionX on TestOption {
+  String get code => this == TestOption.a ? 'A' : 'B';
+  static TestOption fromCode(String code) =>
+      code == 'B' ? TestOption.b : TestOption.a;
+}
+
+class TestAnswer {
+  final String text;
+  final IconData icon;
+  final PetType favors; // cat or dog
+  const TestAnswer({
+    required this.text,
+    required this.icon,
+    required this.favors,
+  });
+}
 
 class TestQuestion {
   final int id;
   final String text;
-  final List<TestAnswer> answers;
+  final TestAnswer answerA;
+  final TestAnswer answerB;
 
   const TestQuestion({
     required this.id,
     required this.text,
-    required this.answers,
+    required this.answerA,
+    required this.answerB,
   });
+
+  TestAnswer answerFor(TestOption o) =>
+      o == TestOption.a ? answerA : answerB;
 }
 
-class TestAnswer {
+/// Static layout of every question — only the parts that don't depend on
+/// language: id, icons and which pet each option favors. The actual prompt and
+/// answer copy is filled in lazily from [PetTestStrings] inside
+/// [PetTestData.questions], so switching language re-localizes the test
+/// without restarting it.
+class _QuestionShape {
   final int id;
-  final String text;
-  final Map<PetArchetype, int> scores;
-
-  const TestAnswer({
+  final IconData iconA;
+  final IconData iconB;
+  const _QuestionShape({
     required this.id,
-    required this.text,
-    required this.scores,
+    required this.iconA,
+    required this.iconB,
   });
 }
 
+/// Result of the personality test. Tie is represented by [catScore] == [dogScore].
 class TestResult {
-  final PetArchetype archetype;
-  final PetType suggestedType;
-  final String description;
-  final int totalScore;
+  final int catScore;
+  final int dogScore;
 
-  const TestResult({
-    required this.archetype,
-    required this.suggestedType,
-    required this.description,
-    required this.totalScore,
-  });
+  const TestResult({required this.catScore, required this.dogScore});
+
+  bool get isTie => catScore == dogScore;
+
+  /// Winning pet type. `null` if it's a tie.
+  PetType? get suggestedType {
+    if (catScore > dogScore) return PetType.cat;
+    if (dogScore > catScore) return PetType.dog;
+    return null;
+  }
+
+  /// Archetype derived from the resulting pet type (for [PetEntity]).
+  /// Cat → calm, Dog → active. On tie defaults to calm.
+  PetArchetype get archetype {
+    switch (suggestedType) {
+      case PetType.dog:
+        return PetArchetype.active;
+      case PetType.cat:
+      case null:
+        return PetArchetype.calm;
+    }
+  }
+
+  int get totalScore => catScore + dogScore;
 }
 
+/// Progress & answers captured during the test. Persisted between launches so
+/// that users who close the app mid-test can resume.
 class PetTestState {
   final int currentQuestionIndex;
-  final Map<int, int> answers; // questionId -> answerId
+  // questionId -> 0 for A / 1 for B (TestOption.index)
+  final Map<int, int> answers;
   final bool isCompleted;
 
   const PetTestState({
@@ -48,6 +99,12 @@ class PetTestState {
     this.answers = const {},
     this.isCompleted = false,
   });
+
+  TestOption? optionFor(int questionId) {
+    final raw = answers[questionId];
+    if (raw == null) return null;
+    return raw == TestOption.b.index ? TestOption.b : TestOption.a;
+  }
 
   PetTestState copyWith({
     int? currentQuestionIndex,
@@ -62,247 +119,102 @@ class PetTestState {
   }
 
   Map<String, dynamic> toJson() => {
-    'currentQuestionIndex': currentQuestionIndex,
-    'answers': answers.map((k, v) => MapEntry(k.toString(), v)),
-    'isCompleted': isCompleted,
-  };
+        'currentQuestionIndex': currentQuestionIndex,
+        'answers': answers.map((k, v) => MapEntry(k.toString(), v)),
+        'isCompleted': isCompleted,
+      };
 
   factory PetTestState.fromJson(Map<String, dynamic> json) {
     return PetTestState(
       currentQuestionIndex: json['currentQuestionIndex'] as int? ?? 0,
       answers: (json['answers'] as Map<String, dynamic>?)?.map(
-        (k, v) => MapEntry(int.parse(k), v as int),
-      ) ?? {},
+            (k, v) => MapEntry(int.parse(k), v as int),
+          ) ??
+          {},
       isCompleted: json['isCompleted'] as bool? ?? false,
     );
   }
 }
 
+/// Static, finite personality test used during pet creation.
+///
+/// Every answer of variant A scores 1 point for a cat; every answer of variant
+/// B scores 1 point for a dog. On a tie the UI offers a manual choice.
 class PetTestData {
-  static const List<TestQuestion> questions = [
-    TestQuestion(
+  // Icons + favors are language-independent and live here. Prompts and answer
+  // copy are pulled from [PetTestStrings] on every read so switching the app
+  // language (or filling in the user gender) immediately re-localizes the
+  // test, no restart required.
+  static const List<_QuestionShape> _shapes = [
+    _QuestionShape(
       id: 1,
-      text: 'Как ты обычно проводишь свободное время?',
-      answers: [
-        TestAnswer(
-          id: 1,
-          text: 'Активно: спорт, прогулки, встречи с друзьями',
-          scores: {PetArchetype.active: 3, PetArchetype.calm: 0, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 2,
-          text: 'Спокойно: книги, фильмы, отдых дома',
-          scores: {PetArchetype.active: 0, PetArchetype.calm: 3, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 3,
-          text: 'Изучаю что-то новое: курсы, хобби, эксперименты',
-          scores: {PetArchetype.active: 1, PetArchetype.calm: 0, PetArchetype.curious: 3},
-        ),
-      ],
+      iconA: Icons.home_rounded,
+      iconB: Icons.directions_walk_rounded,
     ),
-    TestQuestion(
+    _QuestionShape(
       id: 2,
-      text: 'Какой темп жизни тебе ближе?',
-      answers: [
-        TestAnswer(
-          id: 1,
-          text: 'Быстрый: много дел, постоянное движение',
-          scores: {PetArchetype.active: 3, PetArchetype.calm: 0, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 2,
-          text: 'Размеренный: всё по плану, без спешки',
-          scores: {PetArchetype.active: 0, PetArchetype.calm: 3, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 3,
-          text: 'Переменчивый: зависит от настроения и интересов',
-          scores: {PetArchetype.active: 1, PetArchetype.calm: 1, PetArchetype.curious: 2},
-        ),
-      ],
+      iconA: Icons.nightlight_round,
+      iconB: Icons.favorite_rounded,
     ),
-    TestQuestion(
+    _QuestionShape(
       id: 3,
-      text: 'Что тебя больше всего радует?',
-      answers: [
-        TestAnswer(
-          id: 1,
-          text: 'Достижения и победы',
-          scores: {PetArchetype.active: 3, PetArchetype.calm: 0, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 2,
-          text: 'Уют и гармония',
-          scores: {PetArchetype.active: 0, PetArchetype.calm: 3, PetArchetype.curious: 0},
-        ),
-        TestAnswer(
-          id: 3,
-          text: 'Открытия и новые знания',
-          scores: {PetArchetype.active: 0, PetArchetype.calm: 1, PetArchetype.curious: 3},
-        ),
-      ],
+      iconA: Icons.self_improvement_rounded,
+      iconB: Icons.sports_esports_rounded,
     ),
-    TestQuestion(
+    _QuestionShape(
       id: 4,
-      text: 'Как ты реагируешь на неожиданные ситуации?',
-      answers: [
-        TestAnswer(
-          id: 1,
-          text: 'Сразу действую, решаю проблему',
-          scores: {PetArchetype.active: 3, PetArchetype.calm: 0, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 2,
-          text: 'Сначала обдумываю, потом действую',
-          scores: {PetArchetype.active: 0, PetArchetype.calm: 3, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 3,
-          text: 'Интересуюсь причинами, анализирую',
-          scores: {PetArchetype.active: 0, PetArchetype.calm: 1, PetArchetype.curious: 3},
-        ),
-      ],
+      iconA: Icons.schedule_rounded,
+      iconB: Icons.directions_bike_rounded,
     ),
-    TestQuestion(
+    _QuestionShape(
       id: 5,
-      text: 'Какой питомец тебе ближе по духу?',
-      answers: [
-        TestAnswer(
-          id: 1,
-          text: 'Энергичный и игривый',
-          scores: {PetArchetype.active: 3, PetArchetype.calm: 0, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 2,
-          text: 'Спокойный и ласковый',
-          scores: {PetArchetype.active: 0, PetArchetype.calm: 3, PetArchetype.curious: 0},
-        ),
-        TestAnswer(
-          id: 3,
-          text: 'Умный и наблюдательный',
-          scores: {PetArchetype.active: 0, PetArchetype.calm: 1, PetArchetype.curious: 3},
-        ),
-      ],
+      iconA: Icons.ramen_dining_rounded,
+      iconB: Icons.volunteer_activism_rounded,
     ),
-    TestQuestion(
+    _QuestionShape(
       id: 6,
-      text: 'Как ты предпочитаешь общаться?',
-      answers: [
-        TestAnswer(
-          id: 1,
-          text: 'Вживую, с эмоциями и жестами',
-          scores: {PetArchetype.active: 3, PetArchetype.calm: 0, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 2,
-          text: 'Спокойно, один на один',
-          scores: {PetArchetype.active: 0, PetArchetype.calm: 3, PetArchetype.curious: 0},
-        ),
-        TestAnswer(
-          id: 3,
-          text: 'Обсуждая интересные темы и идеи',
-          scores: {PetArchetype.active: 1, PetArchetype.calm: 0, PetArchetype.curious: 3},
-        ),
-      ],
-    ),
-    TestQuestion(
-      id: 7,
-      text: 'Что для тебя важнее в отношениях?',
-      answers: [
-        TestAnswer(
-          id: 1,
-          text: 'Совместные приключения и активности',
-          scores: {PetArchetype.active: 3, PetArchetype.calm: 0, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 2,
-          text: 'Взаимопонимание и поддержка',
-          scores: {PetArchetype.active: 0, PetArchetype.calm: 3, PetArchetype.curious: 1},
-        ),
-        TestAnswer(
-          id: 3,
-          text: 'Общие интересы и развитие',
-          scores: {PetArchetype.active: 1, PetArchetype.calm: 0, PetArchetype.curious: 3},
-        ),
-      ],
+      iconA: Icons.remove_red_eye_rounded,
+      iconB: Icons.celebration_rounded,
     ),
   ];
 
-  static TestResult calculateResult(Map<int, int> answers) {
-    final scores = <PetArchetype, int>{
-      PetArchetype.active: 0,
-      PetArchetype.calm: 0,
-      PetArchetype.curious: 0,
-    };
+  /// Localized list of test questions. Rebuilt on every access — cheap, since
+  /// it just re-wraps a handful of strings — so changing language between two
+  /// frames is reflected instantly.
+  static List<TestQuestion> get questions {
+    return _shapes.map((s) {
+      final str = PetTestStrings.byId(s.id);
+      return TestQuestion(
+        id: s.id,
+        text: str.text,
+        answerA: TestAnswer(
+          text: str.textA,
+          icon: s.iconA,
+          favors: PetType.cat,
+        ),
+        answerB: TestAnswer(
+          text: str.textB,
+          icon: s.iconB,
+          favors: PetType.dog,
+        ),
+      );
+    }).toList(growable: false);
+  }
 
-    for (final entry in answers.entries) {
-      final question = questions.firstWhere((q) => q.id == entry.key);
-      final answer = question.answers.firstWhere((a) => a.id == entry.value);
-      
-      for (final scoreEntry in answer.scores.entries) {
-        scores[scoreEntry.key] = (scores[scoreEntry.key] ?? 0) + scoreEntry.value;
+  /// Tallies answers (A = +1 cat, B = +1 dog) into a [TestResult].
+  static TestResult calculateResult(Map<int, int> answers) {
+    int cat = 0;
+    int dog = 0;
+    for (final raw in answers.values) {
+      if (raw == TestOption.a.index) {
+        cat++;
+      } else if (raw == TestOption.b.index) {
+        dog++;
       }
     }
-
-    final maxEntry = scores.entries.reduce(
-      (a, b) => a.value >= b.value ? a : b,
-    );
-
-    final archetype = maxEntry.key;
-    final totalScore = maxEntry.value;
-
-    // Определяем тип питомца на основе архетипа
-    final suggestedType = archetype == PetArchetype.active 
-        ? PetType.dog 
-        : PetType.cat;
-
-    final description = _getArchetypeDescription(archetype);
-
-    return TestResult(
-      archetype: archetype,
-      suggestedType: suggestedType,
-      description: description,
-      totalScore: totalScore,
-    );
+    return TestResult(catScore: cat, dogScore: dog);
   }
 
-  static String _getArchetypeDescription(PetArchetype archetype) {
-    switch (archetype) {
-      case PetArchetype.active:
-        return 'Тебе подойдёт активный и энергичный питомец! '
-            'Он будет рад играть с тобой, бегать и веселиться. '
-            'Вместе вы точно не заскучаете!';
-      case PetArchetype.calm:
-        return 'Тебе подойдёт спокойный и ласковый питомец! '
-            'Он будет рядом в моменты отдыха, создавая уют и гармонию. '
-            'Идеальный компаньон для релакса.';
-      case PetArchetype.curious:
-        return 'Тебе подойдёт любознательный и умный питомец! '
-            'Он будет исследовать мир вместе с тобой и удивлять своими открытиями. '
-            'Скучно точно не будет!';
-    }
-  }
-
-  static String getArchetypeLabel(PetArchetype archetype) {
-    switch (archetype) {
-      case PetArchetype.active:
-        return 'Активный';
-      case PetArchetype.calm:
-        return 'Спокойный';
-      case PetArchetype.curious:
-        return 'Любознательный';
-    }
-  }
-
-  static String getArchetypeEmoji(PetArchetype archetype) {
-    switch (archetype) {
-      case PetArchetype.active:
-        return '⚡';
-      case PetArchetype.calm:
-        return '🌙';
-      case PetArchetype.curious:
-        return '🔍';
-    }
-  }
+  static String typeLabel(PetType type) =>
+      type == PetType.cat ? 'Кот' : 'Собака';
 }

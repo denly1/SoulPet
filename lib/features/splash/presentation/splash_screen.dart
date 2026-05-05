@@ -1,5 +1,3 @@
-import 'dart:math';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
@@ -75,7 +73,6 @@ class _SplashScreenState extends State<SplashScreen>
         decoration: const BoxDecoration(gradient: AppColors.warmGradient),
         child: Stack(
           children: [
-            ..._buildBubbles(),
             Center(
               child: FadeTransition(
                 opacity: _fadeAnim,
@@ -133,34 +130,4 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-  List<Widget> _buildBubbles() {
-    final rng = Random(42);
-    final screen = MediaQuery.of(context).size;
-    return List.generate(10, (i) {
-      final size = 20.0 + rng.nextDouble() * 70;
-      final top = rng.nextDouble() * screen.height;
-      final left = rng.nextDouble() * screen.width;
-      return Positioned(
-        top: top,
-        left: left,
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: [
-                AppColors.softJade.withValues(alpha: 0.25),
-                Colors.white.withValues(alpha: 0.05),
-              ],
-            ),
-            border: Border.all(
-              color: AppColors.glassBorder,
-              width: 1,
-            ),
-          ),
-        ),
-      );
-    });
-  }
 }

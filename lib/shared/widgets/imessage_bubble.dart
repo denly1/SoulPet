@@ -235,12 +235,12 @@ class IMessageChatExample extends StatelessWidget {
   Widget build(BuildContext context) {
     final messages = [
       (text: 'Hey! How are you?', isMe: true, time: '10:24'),
-      (text: 'I\'m good, thanks! Just finished work 😊', isMe: false, time: '10:25'),
+      (text: 'I\'m good, thanks. Just finished work.', isMe: false, time: '10:25'),
       (text: 'Nice! Want to grab dinner tonight?', isMe: true, time: '10:26'),
       (text: 'Sure! Where do you want to go?', isMe: false, time: '10:27'),
       (text: 'How about that new Italian place downtown?', isMe: true, time: '10:28'),
-      (text: 'Perfect! I\'ve been wanting to try it. See you at 7?', isMe: false, time: '10:29'),
-      (text: '👍', isMe: true, time: '10:29'),
+      (text: 'Perfect, I\'ve been wanting to try it. See you at 7?', isMe: false, time: '10:29'),
+      (text: 'Sounds good.', isMe: true, time: '10:29'),
     ];
 
     return Scaffold(

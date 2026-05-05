@@ -1,8 +1,13 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soulpet/domain/entities/pet_entity.dart';
 import 'package:soulpet/domain/entities/pet_test_entity.dart';
 
+/// Persists pet-creation test progress and the final cat/dog tally.
+///
+/// State is kept across app restarts so users can resume a half-finished test
+/// (ТЗ: "сохранение промежуточного состояния в случае вылета/закрытия
+/// приложения"). Storage is cleared explicitly when the user confirms the pet
+/// or chooses to retake the test.
 class PetTestStorage {
   static const String _stateKey = 'pet_test_state';
   static const String _resultKey = 'pet_test_result';
@@ -12,73 +17,47 @@ class PetTestStorage {
   PetTestStorage(this._prefs);
 
   Future<void> saveState(PetTestState state) async {
-    final json = jsonEncode(state.toJson());
-    await _prefs.setString(_stateKey, json);
+    await _prefs.setString(_stateKey, jsonEncode(state.toJson()));
   }
 
   PetTestState? loadState() {
-    final json = _prefs.getString(_stateKey);
-    if (json == null) return null;
-    
+    final raw = _prefs.getString(_stateKey);
+    if (raw == null) return null;
     try {
-      final map = jsonDecode(json) as Map<String, dynamic>;
-      return PetTestState.fromJson(map);
-    } catch (e) {
+      return PetTestState.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
       return null;
     }
   }
 
-  Future<void> clearState() async {
-    await _prefs.remove(_stateKey);
-  }
+  Future<void> clearState() => _prefs.remove(_stateKey);
 
   Future<void> saveResult(TestResult result) async {
     final map = {
-      'archetype': result.archetype.name,
-      'suggestedType': result.suggestedType.name,
-      'description': result.description,
-      'totalScore': result.totalScore,
+      'catScore': result.catScore,
+      'dogScore': result.dogScore,
     };
     await _prefs.setString(_resultKey, jsonEncode(map));
   }
 
   TestResult? loadResult() {
-    final json = _prefs.getString(_resultKey);
-    if (json == null) return null;
-    
+    final raw = _prefs.getString(_resultKey);
+    if (raw == null) return null;
     try {
-      final map = jsonDecode(json) as Map<String, dynamic>;
+      final map = jsonDecode(raw) as Map<String, dynamic>;
       return TestResult(
-        archetype: _parseArchetype(map['archetype'] as String),
-        suggestedType: _parseType(map['suggestedType'] as String),
-        description: map['description'] as String,
-        totalScore: map['totalScore'] as int,
+        catScore: (map['catScore'] as num?)?.toInt() ?? 0,
+        dogScore: (map['dogScore'] as num?)?.toInt() ?? 0,
       );
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
 
-  Future<void> clearResult() async {
-    await _prefs.remove(_resultKey);
-  }
+  Future<void> clearResult() => _prefs.remove(_resultKey);
 
   Future<void> clearAll() async {
     await clearState();
     await clearResult();
-  }
-
-  static PetArchetype _parseArchetype(String value) {
-    return PetArchetype.values.firstWhere(
-      (e) => e.name == value,
-      orElse: () => PetArchetype.calm,
-    );
-  }
-
-  static PetType _parseType(String value) {
-    return PetType.values.firstWhere(
-      (e) => e.name == value,
-      orElse: () => PetType.cat,
-    );
   }
 }

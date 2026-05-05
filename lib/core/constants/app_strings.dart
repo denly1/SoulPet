@@ -16,13 +16,13 @@ class AppStrings {
   // Onboarding
   static const String onboardingTitle1 = 'Познакомься со своим питомцем';
   static const String onboardingDesc1 =
-      'У тебя появится уникальный виртуальный компаньон, который живёт своей жизнью';
+      'У тебя появится уникальный виртуальный компаньон';
   static const String onboardingTitle2 = 'Он живёт в твоём мире';
   static const String onboardingDesc2 =
       'Питомец реагирует на время суток, погоду и твоё настроение';
   static const String onboardingTitle3 = 'Без обязательств';
   static const String onboardingDesc3 =
-      'Просто наблюдай, иногда взаимодействуй. Питомец не требует постоянного ухода';
+      'Питомец это твоё дополнение к времяпрепровождению, а не обязательство';
   static const String getStarted = 'Начать';
 
   // Auth

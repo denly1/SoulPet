@@ -65,7 +65,9 @@ class _HomeScreenState extends State<HomeScreen>
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      barrierColor: Colors.transparent,
       isScrollControlled: true,
+      enableDrag: true,
       builder: (_) => _ProfileSheet(onLogout: _logout),
     );
   }

@@ -75,6 +75,7 @@ flutter:
     - assets/images/
     - assets/animations/
     - assets/data/
+    - assets/pets/
 
   fonts:
     - family: Inter
