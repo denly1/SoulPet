@@ -11,11 +11,11 @@ class StringsRu {
   static const String success = 'Успешно';
   static const String skip = 'Пропустить';
 
-  static const String onboardingTitle1 = 'Познакомься со своим питомцем';
-  static const String onboardingDesc1 = 'У тебя появится уникальный виртуальный компаньон';
-  static const String onboardingTitle2 = 'Он живёт в твоём мире';
-  static const String onboardingDesc2 = 'Питомец реагирует на время суток, погоду и твоё настроение';
-  static const String onboardingTitle3 = 'Без обязательств';
+  static const String onboardingTitle1 = 'Дружба без условий';
+  static const String onboardingDesc1 = 'Он здесь не как обязанность, а как выбор';
+  static const String onboardingTitle2 = 'Воплощение цифровой свободы';
+  static const String onboardingDesc2 = 'Не требует заботы, но готов разделить с вами моменты присутствия';
+  static const String onboardingTitle3 = 'Питомец, который ценит независимость';
   static const String onboardingDesc3 = 'Питомец это твоё дополнение к времяпрепровождению, а не обязательство';
   static const String getStarted = 'Начать';
 
@@ -51,6 +51,14 @@ class StringsRu {
   static const String profile = 'Профиль';
   static const String shop = 'Магазин';
   static const String inventory = 'Инвентарь';
+
+  // ── Auth errors ──
+  static const String authEmailNotFound = 'Аккаунт с таким email не найден';
+  static const String authWrongPassword = 'Неверный пароль';
+  static const String authEmailExists = 'Аккаунт с таким email уже существует';
+  static const String authDialogTitle = 'Аккаунт не найден';
+  static const String authDialogBody = 'Аккаунта с таким email не существует. Хочешь зарегистрироваться?';
+  static const String authDialogRegister = 'Регистрация';
 
   static const String networkError = 'Ошибка подключения';
   static const String serverError = 'Ошибка сервера';

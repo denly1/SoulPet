@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 /// Pet portraits — flat, static images bundled with the app.
 ///
 /// Source files live in `assets/pets/`:
-///   * `cat.webp` — used by [CatIllustration] / `AnimatedPet(isCat: true)`
-///   * `dog.webp` — used by [DogIllustration] / `AnimatedPet(isCat: false)`
+///   * `cat.png` — used by [CatIllustration] / `AnimatedPet(isCat: true)`
+///   * `dog.png` — used by [DogIllustration] / `AnimatedPet(isCat: false)`
 ///
 /// We deliberately keep these as plain [Image.asset]s — no idle bobbing,
 /// blinking or tail-wagging animations — so the user-supplied AI-generated
@@ -32,7 +32,7 @@ class CatIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _PetPortrait(asset: 'assets/pets/cat.webp', size: size, isCat: true);
+      _PetPortrait(asset: 'assets/pets/cat.png', size: size, isCat: true);
 }
 
 class DogIllustration extends StatelessWidget {
@@ -49,7 +49,7 @@ class DogIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _PetPortrait(asset: 'assets/pets/dog.webp', size: size, isCat: false);
+      _PetPortrait(asset: 'assets/pets/dog.png', size: size, isCat: false);
 }
 
 /// Thin shim around the static portraits so existing callers
@@ -93,31 +93,17 @@ class _PetPortrait extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Solid white backdrop eliminates dark alpha-fringe on the webp edges.
-          Container(
-            width: size * 0.88,
-            height: size * 0.88,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-          ),
-          Image.asset(
-            asset,
-            width: size,
-            height: size,
-            fit: BoxFit.contain,
-            filterQuality: FilterQuality.high,
-            isAntiAlias: true,
-            errorBuilder: (context, error, stack) => _MissingPetPlaceholder(
-              size: size,
-              isCat: isCat,
-            ),
-          ),
-        ],
+      child: Image.asset(
+        asset,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+        isAntiAlias: true,
+        errorBuilder: (context, error, stack) => _MissingPetPlaceholder(
+          size: size,
+          isCat: isCat,
+        ),
       ),
     );
   }

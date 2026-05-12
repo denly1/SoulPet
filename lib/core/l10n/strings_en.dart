@@ -11,11 +11,11 @@ class StringsEn {
   static const String success = 'Success';
   static const String skip = 'Skip';
 
-  static const String onboardingTitle1 = 'Meet your pet';
-  static const String onboardingDesc1 = 'You\'ll get a unique virtual companion';
-  static const String onboardingTitle2 = 'It lives in your world';
-  static const String onboardingDesc2 = 'Your pet reacts to time of day, weather and your mood';
-  static const String onboardingTitle3 = 'No obligations';
+  static const String onboardingTitle1 = 'Friendship without conditions';
+  static const String onboardingDesc1 = 'It\'s here not as a duty, but as a choice';
+  static const String onboardingTitle2 = 'The embodiment of digital freedom';
+  static const String onboardingDesc2 = 'Requires no care, but ready to share moments of presence with you';
+  static const String onboardingTitle3 = 'A pet that values independence';
   static const String onboardingDesc3 = 'A pet is a fun addition to your free time, not an obligation';
   static const String getStarted = 'Get Started';
 
@@ -51,6 +51,14 @@ class StringsEn {
   static const String profile = 'Profile';
   static const String shop = 'Shop';
   static const String inventory = 'Inventory';
+
+  // ── Auth errors ──
+  static const String authEmailNotFound = 'Account with this email not found';
+  static const String authWrongPassword = 'Wrong password';
+  static const String authEmailExists = 'An account with this email already exists';
+  static const String authDialogTitle = 'Account not found';
+  static const String authDialogBody = 'No account with this email exists. Would you like to register?';
+  static const String authDialogRegister = 'Register';
 
   static const String networkError = 'Connection error';
   static const String serverError = 'Server error';

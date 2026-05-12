@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -227,66 +228,37 @@ class _PetResultScreenState extends State<PetResultScreen> {
             : (cardMaxWidth * 0.62).clamp(180.0, 240.0);
 
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(32),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.65),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.deepMoss.withValues(alpha: 0.12),
-                blurRadius: 28,
-                offset: const Offset(0, 12),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
           child: result.isTie
               ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    AnimatedPet(isCat: true, size: petSize)
-                        .animate()
-                        .fadeIn(delay: 320.ms, duration: 500.ms)
-                        .scale(
-                          begin: const Offset(0.7, 0.7),
-                          end: const Offset(1, 1),
-                          curve: Curves.elasticOut,
-                          duration: 900.ms,
-                        ),
-                    const SizedBox(width: 4),
-                    AnimatedPet(isCat: false, size: petSize)
-                        .animate()
-                        .fadeIn(delay: 440.ms, duration: 500.ms)
-                        .scale(
-                          begin: const Offset(0.7, 0.7),
-                          end: const Offset(1, 1),
-                          curve: Curves.elasticOut,
-                          duration: 900.ms,
-                        ),
+                    Expanded(
+                      child: _StyledPetCard(isCat: true, size: petSize)
+                          .animate()
+                          .fadeIn(delay: 320.ms, duration: 500.ms)
+                          .moveY(begin: 24, end: 0, curve: Curves.easeOutCubic),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _StyledPetCard(isCat: false, size: petSize)
+                          .animate()
+                          .fadeIn(delay: 440.ms, duration: 500.ms)
+                          .moveY(begin: 24, end: 0, curve: Curves.easeOutCubic),
+                    ),
                   ],
                 )
-              : Center(
-                  child: AnimatedPet(
-                    isCat: result.suggestedType == PetType.cat,
-                    size: petSize,
-                  )
-                      .animate()
-                      .fadeIn(delay: 320.ms, duration: 500.ms)
-                      .scale(
-                        begin: const Offset(0.6, 0.6),
-                        end: const Offset(1, 1),
-                        curve: Curves.elasticOut,
-                        duration: 1100.ms,
-                      ),
-                ),
+              : _StyledPetCard(
+                  isCat: result.suggestedType == PetType.cat,
+                  size: petSize,
+                )
+                    .animate()
+                    .fadeIn(delay: 320.ms, duration: 500.ms)
+                    .scale(
+                      begin: const Offset(0.85, 0.85),
+                      end: const Offset(1, 1),
+                      curve: Curves.elasticOut,
+                      duration: 900.ms,
+                    ),
         )
             .animate()
             .fadeIn(delay: 280.ms, duration: 500.ms)
@@ -448,6 +420,94 @@ class _PrimaryButtonState extends State<_PrimaryButton>
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Стилизованная карточка питомца — такой же стиль как на intro экране.
+class _StyledPetCard extends StatelessWidget {
+  final bool isCat;
+  final double size;
+  const _StyledPetCard({required this.isCat, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = isCat
+        ? const Color(0xFF8EC5A8)
+        : const Color(0xFFE8B97A);
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: 0.35),
+            blurRadius: 28,
+            spreadRadius: 0,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withValues(alpha: 0.82),
+                    accent.withValues(alpha: 0.18),
+                    Colors.white.withValues(alpha: 0.65),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  width: 1.5,
+                ),
+              ),
+            ),
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: Container(color: Colors.transparent),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 20, 10, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: size * 0.85,
+                        height: size * 0.85,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              accent.withValues(alpha: 0.30),
+                              accent.withValues(alpha: 0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                      AnimatedPet(isCat: isCat, size: size),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

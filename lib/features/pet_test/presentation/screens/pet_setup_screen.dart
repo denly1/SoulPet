@@ -232,8 +232,14 @@ class _PetSetupScreenState extends State<PetSetupScreen> {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        AppColors.softJade.withValues(alpha: 0.55),
-                        AppColors.softJade.withValues(alpha: 0.0),
+                        (_petType == PetType.cat
+                                ? const Color(0xFF8EC5A8)
+                                : const Color(0xFFE8B97A))
+                            .withValues(alpha: 0.45),
+                        (_petType == PetType.cat
+                                ? const Color(0xFF8EC5A8)
+                                : const Color(0xFFE8B97A))
+                            .withValues(alpha: 0.0),
                       ],
                     ),
                   ),

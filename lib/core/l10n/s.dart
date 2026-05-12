@@ -60,6 +60,14 @@ class S {
   static String get shop => _isRu ? StringsRu.shop : StringsEn.shop;
   static String get inventory => _isRu ? StringsRu.inventory : StringsEn.inventory;
 
+  // ── Auth errors ──
+  static String get authEmailNotFound => _isRu ? StringsRu.authEmailNotFound : StringsEn.authEmailNotFound;
+  static String get authWrongPassword => _isRu ? StringsRu.authWrongPassword : StringsEn.authWrongPassword;
+  static String get authEmailExists => _isRu ? StringsRu.authEmailExists : StringsEn.authEmailExists;
+  static String get authDialogTitle => _isRu ? StringsRu.authDialogTitle : StringsEn.authDialogTitle;
+  static String get authDialogBody => _isRu ? StringsRu.authDialogBody : StringsEn.authDialogBody;
+  static String get authDialogRegister => _isRu ? StringsRu.authDialogRegister : StringsEn.authDialogRegister;
+
   static String get networkError => _isRu ? StringsRu.networkError : StringsEn.networkError;
   static String get serverError => _isRu ? StringsRu.serverError : StringsEn.serverError;
   static String get unknownError => _isRu ? StringsRu.unknownError : StringsEn.unknownError;

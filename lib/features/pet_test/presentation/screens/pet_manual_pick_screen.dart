@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -107,25 +108,48 @@ class _PetManualPickScreenState extends State<PetManualPickScreen> {
                       .fadeIn(delay: 100.ms, duration: 400.ms)
                       .moveY(begin: 8, end: 0),
                   const SizedBox(height: 28),
-                  _PetOptionCard(
-                    isCat: true,
-                    title: S.petManualKitten,
-                    description: S.petManualKittenDesc,
-                    onTap: () => _pick(context, PetType.cat),
-                  )
-                      .animate()
-                      .fadeIn(delay: 220.ms, duration: 450.ms)
-                      .moveX(begin: -12, end: 0, curve: Curves.easeOutCubic),
-                  const SizedBox(height: 14),
-                  _PetOptionCard(
-                    isCat: false,
-                    title: S.petManualPuppy,
-                    description: S.petManualPuppyDesc,
-                    onTap: () => _pick(context, PetType.dog),
-                  )
-                      .animate()
-                      .fadeIn(delay: 340.ms, duration: 450.ms)
-                      .moveX(begin: 12, end: 0, curve: Curves.easeOutCubic),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final petSize =
+                          (constraints.maxWidth * 0.38).clamp(120.0, 170.0);
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: _PetPickCard(
+                              isCat: true,
+                              size: petSize,
+                              label: S.petManualKitten,
+                              desc: S.petManualKittenDesc,
+                              onTap: () => _pick(context, PetType.cat),
+                            )
+                                .animate()
+                                .fadeIn(delay: 220.ms, duration: 450.ms)
+                                .moveY(
+                                    begin: 24,
+                                    end: 0,
+                                    curve: Curves.easeOutCubic),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _PetPickCard(
+                              isCat: false,
+                              size: petSize,
+                              label: S.petManualPuppy,
+                              desc: S.petManualPuppyDesc,
+                              onTap: () => _pick(context, PetType.dog),
+                            )
+                                .animate()
+                                .fadeIn(delay: 340.ms, duration: 450.ms)
+                                .moveY(
+                                    begin: 24,
+                                    end: 0,
+                                    curve: Curves.easeOutCubic),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                   const Spacer(),
                   Center(
                     child: Text(
@@ -148,24 +172,26 @@ class _PetManualPickScreenState extends State<PetManualPickScreen> {
   }
 }
 
-class _PetOptionCard extends StatefulWidget {
+class _PetPickCard extends StatefulWidget {
   final bool isCat;
-  final String title;
-  final String description;
+  final double size;
+  final String label;
+  final String desc;
   final VoidCallback onTap;
 
-  const _PetOptionCard({
+  const _PetPickCard({
     required this.isCat,
-    required this.title,
-    required this.description,
+    required this.size,
+    required this.label,
+    required this.desc,
     required this.onTap,
   });
 
   @override
-  State<_PetOptionCard> createState() => _PetOptionCardState();
+  State<_PetPickCard> createState() => _PetPickCardState();
 }
 
-class _PetOptionCardState extends State<_PetOptionCard>
+class _PetPickCardState extends State<_PetPickCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _press;
 
@@ -188,6 +214,10 @@ class _PetOptionCardState extends State<_PetOptionCard>
 
   @override
   Widget build(BuildContext context) {
+    final accent = widget.isCat
+        ? const Color(0xFF8EC5A8)
+        : const Color(0xFFE8B97A);
+
     return GestureDetector(
       onTapDown: (_) => _press.forward(),
       onTapCancel: () => _press.reverse(),
@@ -198,79 +228,118 @@ class _PetOptionCardState extends State<_PetOptionCard>
       child: AnimatedBuilder(
         animation: _press,
         builder: (context, _) {
-          final scale = 1 - _press.value;
           return Transform.scale(
-            scale: scale,
+            scale: 1 - _press.value,
             child: Container(
-              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  width: 1,
-                ),
+                borderRadius: BorderRadius.circular(32),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.deepMoss.withValues(alpha: 0.12),
-                    blurRadius: 20,
+                    color: accent.withValues(alpha: 0.35),
+                    blurRadius: 28,
+                    spreadRadius: 0,
                     offset: const Offset(0, 10),
                   ),
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 12,
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 16,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 96,
-                    height: 96,
-                    child: AnimatedPet(isCat: widget.isCat, size: 92),
-                  ),
-                  const SizedBox(width: 18),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.title,
-                          style: TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.2,
-                          ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(32),
+                child: Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withValues(alpha: 0.82),
+                            accent.withValues(alpha: 0.20),
+                            Colors.white.withValues(alpha: 0.65),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          widget.description,
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 13,
-                            height: 1.35,
-                          ),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          width: 1.5,
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.deepMoss.withValues(alpha: 0.12),
+                    BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                      child: Container(color: Colors.transparent),
                     ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.chevron_right_rounded,
-                      color: AppColors.deepMoss,
-                      size: 22,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: widget.size * 0.85,
+                                height: widget.size * 0.85,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: RadialGradient(
+                                    colors: [
+                                      accent.withValues(alpha: 0.30),
+                                      accent.withValues(alpha: 0.0),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              AnimatedPet(isCat: widget.isCat, size: widget.size),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 6),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  accent.withValues(alpha: 0.55),
+                                  accent.withValues(alpha: 0.30),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              widget.label,
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            widget.desc,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

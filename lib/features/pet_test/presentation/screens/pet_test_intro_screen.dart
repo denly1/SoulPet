@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -137,34 +138,25 @@ class _PetTestIntroScreenState extends State<PetTestIntroScreen> {
                   .animate()
                   .fadeIn(delay: 260.ms, duration: 550.ms)
                   .moveY(begin: 12, end: 0),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  AnimatedPet(isCat: true, size: petSize)
-                      .animate()
-                      .fadeIn(delay: 380.ms, duration: 600.ms)
-                      .scale(
-                        begin: const Offset(0.8, 0.8),
-                        end: const Offset(1, 1),
-                        curve: Curves.elasticOut,
-                        duration: 900.ms,
-                      ),
-                  const SizedBox(width: 8),
-                  AnimatedPet(isCat: false, size: petSize)
-                      .animate()
-                      .fadeIn(delay: 520.ms, duration: 600.ms)
-                      .scale(
-                        begin: const Offset(0.8, 0.8),
-                        end: const Offset(1, 1),
-                        curve: Curves.elasticOut,
-                        duration: 900.ms,
-                      ),
+                  Expanded(
+                    child: _PetCard(isCat: true, size: petSize)
+                        .animate()
+                        .fadeIn(delay: 340.ms, duration: 500.ms)
+                        .moveY(begin: 30, end: 0, curve: Curves.easeOutCubic),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _PetCard(isCat: false, size: petSize)
+                        .animate()
+                        .fadeIn(delay: 480.ms, duration: 500.ms)
+                        .moveY(begin: 30, end: 0, curve: Curves.easeOutCubic),
+                  ),
                 ],
-              )
-                  .animate()
-                  .fadeIn(delay: 360.ms, duration: 500.ms)
-                  .moveY(begin: 20, end: 0, curve: Curves.easeOutCubic),
+              ),
             ],
           ),
         );
@@ -196,6 +188,131 @@ class _PetTestIntroScreenState extends State<PetTestIntroScreen> {
             .fadeIn(delay: 820.ms, duration: 400.ms)
             .moveY(begin: 10, end: 0),
       ],
+    );
+  }
+}
+
+/// Карточка питомца — красивая, с градиентом и свечением.
+class _PetCard extends StatelessWidget {
+  final bool isCat;
+  final double size;
+  const _PetCard({required this.isCat, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = isCat ? S.petManualKitten : S.petManualPuppy;
+
+    // Уникальные акцентные цвета для каждого питомца
+    final accent = isCat
+        ? const Color(0xFF8EC5A8) // мятно-зелёный для кота
+        : const Color(0xFFE8B97A); // тёплый золотой для собаки
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: 0.35),
+            blurRadius: 28,
+            spreadRadius: 0,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: Stack(
+          children: [
+            // Градиентный фон карточки
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withValues(alpha: 0.82),
+                    accent.withValues(alpha: 0.18),
+                    Colors.white.withValues(alpha: 0.65),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  width: 1.5,
+                ),
+              ),
+            ),
+            // Размытие фона для стеклянного эффекта
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: Container(color: Colors.transparent),
+            ),
+            // Контент
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 20, 10, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Свечение за питомцем
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: size * 0.85,
+                        height: size * 0.85,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              accent.withValues(alpha: 0.30),
+                              accent.withValues(alpha: 0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                      AnimatedPet(isCat: isCat, size: size),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Подпись
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18, vertical: 7),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          accent.withValues(alpha: 0.55),
+                          accent.withValues(alpha: 0.30),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

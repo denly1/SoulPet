@@ -45,28 +45,94 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _loading = false);
     result.fold(
       (failure) {
-        if (failure.message.contains('не найден')) {
+        if (failure.message == S.authEmailNotFound) {
           showDialog(
             context: context,
-            builder: (ctx) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              title: const Text('Аккаунт не найден'),
-              content: const Text(
-                  'Аккаунта с таким email не существует. Хочешь зарегистрироваться?'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Отмена'),
+            barrierColor: Colors.black.withValues(alpha: 0.25),
+            builder: (ctx) => Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: LiquidGlassCard(
+                borderRadius: 28,
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.person_search_rounded,
+                        size: 40, color: AppColors.deepMoss),
+                    const SizedBox(height: 14),
+                    Text(
+                      S.authDialogTitle,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      S.authDialogBody,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 22),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => Navigator.pop(ctx),
+                            child: Container(
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: AppColors.mistBorder.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(S.cancel,
+                                  style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontWeight: FontWeight.w600)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              context.go(AppRoutes.register);
+                            },
+                            child: Container(
+                              height: 44,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.deepMoss.withValues(alpha: 0.85),
+                                    AppColors.liquidGreen.withValues(alpha: 0.75),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(S.authDialogRegister,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    context.go(AppRoutes.register);
-                  },
-                  child: const Text('Зарегистрироваться'),
-                ),
-              ],
+              ),
             ),
           );
         } else {

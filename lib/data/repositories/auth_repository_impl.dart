@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:soulpet/core/l10n/s.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soulpet/core/constants/app_constants.dart';
 import 'package:soulpet/core/errors/exceptions.dart';
@@ -34,11 +35,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (savedEmail == null ||
           savedEmail.trim().toLowerCase() != email.trim().toLowerCase()) {
-        return const Left(AuthFailure('Аккаунт с таким email не найден'));
+        return Left(AuthFailure(S.authEmailNotFound));
       }
 
       if (savedPassword == null || savedPassword != password) {
-        return const Left(AuthFailure('Неверный пароль'));
+        return Left(AuthFailure(S.authWrongPassword));
       }
 
       final savedUserId = prefs.getString(AppConstants.keyRegisteredUserId);
@@ -78,7 +79,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (existingEmail != null &&
           existingEmail.trim().toLowerCase() == email.trim().toLowerCase()) {
-        return const Left(AuthFailure('Аккаунт с таким email уже существует'));
+        return Left(AuthFailure(S.authEmailExists));
       }
 
       final newUserId = const Uuid().v4();
