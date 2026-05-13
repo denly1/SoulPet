@@ -33,6 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onLocaleChanged() => setState(() {});
+  
+  // No revalidation here: individual AuthField widgets refresh their visible
+  // error texts on locale change without triggering first-time validation.
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;

@@ -32,7 +32,7 @@ class CatIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _PetPortrait(asset: 'assets/pets/cat.png', size: size, isCat: true);
+      _PetPortrait(asset: 'assets/pets/itogcat.png', size: size, isCat: true);
 }
 
 class DogIllustration extends StatelessWidget {
@@ -49,7 +49,7 @@ class DogIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _PetPortrait(asset: 'assets/pets/dog.png', size: size, isCat: false);
+      _PetPortrait(asset: 'assets/pets/itogdog.png', size: size, isCat: false);
 }
 
 /// Thin shim around the static portraits so existing callers

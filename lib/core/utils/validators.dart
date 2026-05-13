@@ -1,5 +1,6 @@
 import 'package:soulpet/core/constants/app_constants.dart';
 import 'package:soulpet/core/l10n/s.dart';
+import 'package:soulpet/core/l10n/locale_provider.dart';
 
 class Validators {
   Validators._();
@@ -53,7 +54,11 @@ class Validators {
       return S.nameTooShort;
     }
     if (value.trim().length > AppConstants.maxPetNameLength) {
-      return 'Имя слишком длинное (макс. ${AppConstants.maxPetNameLength} символов)';
+      final isRu = LocaleProvider.instance.isRu;
+      final max = AppConstants.maxPetNameLength;
+      return isRu
+          ? 'Имя слишком длинное (макс. $max символов)'
+          : 'Name is too long (max. $max characters)';
     }
     return null;
   }

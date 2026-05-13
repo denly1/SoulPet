@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soulpet/core/constants/app_colors.dart';
 import 'package:soulpet/shared/widgets/liquid_glass.dart';
-
-/// Frosted-glass pill input used across the auth flow (login, register,
-/// forgot-password). Visually similar to [PillTextField] but with a leading
-/// icon that sits flush (no circle background) and an optional trailing
-/// suffix icon — matching the existing auth-screen design.
-///
-/// Crucially, the validation error is rendered as a polished animated label
-/// **below** the pill instead of using Flutter's built-in [InputDecorator]
-/// error, which used to leak past the pill bounds and look cramped.
+import 'package:soulpet/core/l10n/locale_provider.dart';
 class AuthField extends StatefulWidget {
   final TextEditingController controller;
   final String hint;
@@ -50,10 +42,26 @@ class _AuthFieldState extends State<AuthField> {
   void initState() {
     super.initState();
     _focusNode = FocusNode()..addListener(() => setState(() {}));
+    // Re-render and re-validate on locale changes so existing error labels
+    // switch language instantly even if they are already visible.
+    LocaleProvider.instance.addListener(_onLocaleChanged);
+  }
+
+  void _onLocaleChanged() {
+    if (!mounted) return;
+    // Update error text language only if an error is already shown; do not
+    // trigger first-time validation on locale toggle.
+    if (_errorText != null && widget.validator != null) {
+      final res = widget.validator!.call(widget.controller.text);
+      setState(() => _errorText = res);
+      return;
+    }
+    setState(() {});
   }
 
   @override
   void dispose() {
+    LocaleProvider.instance.removeListener(_onLocaleChanged);
     _focusNode.dispose();
     super.dispose();
   }

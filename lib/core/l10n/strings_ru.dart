@@ -52,6 +52,14 @@ class StringsRu {
   static const String shop = 'Магазин';
   static const String inventory = 'Инвентарь';
 
+  // Profile sheet
+  static const String myProfile = 'Мой профиль';
+  static const String userSubtitle = 'Пользователь Soul Pet';
+  static const String settings = 'Настройки';
+  static const String notifications = 'Уведомления';
+  static const String help = 'Помощь';
+  static const String signOut = 'Выйти';
+
   // ── Auth errors ──
   static const String authEmailNotFound = 'Аккаунт с таким email не найден';
   static const String authWrongPassword = 'Неверный пароль';

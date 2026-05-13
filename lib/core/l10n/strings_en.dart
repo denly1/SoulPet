@@ -52,6 +52,14 @@ class StringsEn {
   static const String shop = 'Shop';
   static const String inventory = 'Inventory';
 
+  // Profile sheet
+  static const String myProfile = 'My Profile';
+  static const String userSubtitle = 'Soul Pet user';
+  static const String settings = 'Settings';
+  static const String notifications = 'Notifications';
+  static const String help = 'Help';
+  static const String signOut = 'Sign Out';
+
   // ── Auth errors ──
   static const String authEmailNotFound = 'Account with this email not found';
   static const String authWrongPassword = 'Wrong password';

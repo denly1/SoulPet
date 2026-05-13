@@ -500,7 +500,9 @@ class _StyledPetCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      AnimatedPet(isCat: isCat, size: size),
+                      Center(
+                        child: AnimatedPet(isCat: isCat, size: size),
+                      ),
                     ],
                   ),
                 ],

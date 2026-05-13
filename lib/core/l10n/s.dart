@@ -60,6 +60,14 @@ class S {
   static String get shop => _isRu ? StringsRu.shop : StringsEn.shop;
   static String get inventory => _isRu ? StringsRu.inventory : StringsEn.inventory;
 
+  // Profile sheet
+  static String get myProfile => _isRu ? StringsRu.myProfile : StringsEn.myProfile;
+  static String get userSubtitle => _isRu ? StringsRu.userSubtitle : StringsEn.userSubtitle;
+  static String get settings => _isRu ? StringsRu.settings : StringsEn.settings;
+  static String get notifications => _isRu ? StringsRu.notifications : StringsEn.notifications;
+  static String get help => _isRu ? StringsRu.help : StringsEn.help;
+  static String get signOut => _isRu ? StringsRu.signOut : StringsEn.signOut;
+
   // ── Auth errors ──
   static String get authEmailNotFound => _isRu ? StringsRu.authEmailNotFound : StringsEn.authEmailNotFound;
   static String get authWrongPassword => _isRu ? StringsRu.authWrongPassword : StringsEn.authWrongPassword;

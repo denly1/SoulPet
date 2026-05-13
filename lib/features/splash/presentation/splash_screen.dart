@@ -14,10 +14,15 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnim;
   late Animation<double> _fadeAnim;
+
+  late AnimationController _textController;
+  late Animation<double> _t1Fade;
+  late Animation<double> _t2Fade;
+  late Animation<double> _t3Fade;
 
   @override
   void initState() {
@@ -36,11 +41,38 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
     _controller.forward();
+
+    // Text sequence: 0.8s delay + 1.5s each line (total 5.3s)
+    _textController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 5300),
+    );
+
+    const delayEnd = 0.15;  // 800/5300 initial delay
+    const t1End = 0.434;    // (800+1500)/5300
+    const t2End = 0.717;    // (800+3000)/5300
+    const t3End = 1.0;      // (800+4500)/5300
+
+    _t1Fade = CurvedAnimation(
+      parent: _textController,
+      curve: const Interval(delayEnd, t1End, curve: Curves.easeOut),
+    );
+    _t2Fade = CurvedAnimation(
+      parent: _textController,
+      curve: const Interval(t1End, t2End, curve: Curves.easeOut),
+    );
+    _t3Fade = CurvedAnimation(
+      parent: _textController,
+      curve: const Interval(t2End, t3End, curve: Curves.easeOut),
+    );
+
+
+    _textController.forward();
     _navigate();
   }
 
   Future<void> _navigate() async {
-    await Future.delayed(const Duration(milliseconds: 2500));
+    await Future.delayed(const Duration(milliseconds: 5500));
     if (!mounted) return;
 
     final authDatasource = sl<AuthLocalDatasource>();
@@ -61,6 +93,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void dispose() {
     _controller.dispose();
+    _textController.dispose();
     super.dispose();
   }
 
@@ -91,7 +124,7 @@ class _SplashScreenState extends State<SplashScreen>
                               size: 64, color: AppColors.deepMoss),
                         ),
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 36),
                       Text(
                         'Soulpet',
                         style: TextStyle(
@@ -101,14 +134,49 @@ class _SplashScreenState extends State<SplashScreen>
                           letterSpacing: 1.5,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Спокойный AI-компаньон',
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      const SizedBox(height: 28),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FadeTransition(
+                            opacity: _t1Fade,
+                            child: Text(
+                              'Персональный',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          FadeTransition(
+                            opacity: _t2Fade,
+                            child: Text(
+                              'Эксклюзивный',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          FadeTransition(
+                            opacity: _t3Fade,
+                            child: Text(
+                              'Твой уникальный AI-компаньон',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 48),
                       SizedBox(
