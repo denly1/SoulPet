@@ -113,7 +113,7 @@ class _PetManualPickScreenState extends State<PetManualPickScreen> {
                       final petSize =
                           (constraints.maxWidth * 0.38).clamp(120.0, 170.0);
                       return Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: _PetPickCard(
@@ -326,13 +326,19 @@ class _PetPickCardState extends State<_PetPickCard>
                             ),
                           ),
                           const SizedBox(height: 6),
-                          Text(
-                            widget.desc,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 12,
-                              height: 1.3,
+                          SizedBox(
+                            height: 32,
+                            child: Center(
+                              child: Text(
+                                widget.desc,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 12,
+                                  height: 1.3,
+                                ),
+                              ),
                             ),
                           ),
                         ],
