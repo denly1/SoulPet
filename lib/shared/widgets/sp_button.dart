@@ -58,7 +58,7 @@ class SpButton extends StatelessWidget {
         width: 22,
         height: 22,
         child: CircularProgressIndicator(
-          color: textColor.withOpacity(0.8),
+          color: textColor.withValues(alpha: 0.8),
           strokeWidth: 2.5,
         ),
       );

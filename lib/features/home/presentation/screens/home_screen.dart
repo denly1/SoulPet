@@ -8,7 +8,7 @@ import 'package:soulpet/core/router/app_router.dart';
 import 'package:soulpet/data/datasources/local/auth_local_datasource.dart';
 import 'package:soulpet/shared/widgets/liquid_glass.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_3d_controller/flutter_3d_controller.dart';
+import 'package:o3d/o3d.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -157,12 +157,12 @@ class _PetHomeArea extends StatefulWidget {
 }
 
 class _PetHomeAreaState extends State<_PetHomeArea> {
-  late Flutter3DController _controller;
+  late O3DController controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = Flutter3DController();
+    controller = O3DController();
   }
 
   @override
@@ -170,12 +170,10 @@ class _PetHomeAreaState extends State<_PetHomeArea> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SizedBox(
-          width: 250,
-          height: 250,
-          child: Flutter3DViewer(
-            controller: _controller,
-            src: 'assets/models/catplusarmorlb.glb',
+        Expanded(
+          child: O3D.asset(
+            src: 'assets/models/show_withcat.glb',
+            controller: controller,
           ),
         ),
         const SizedBox(height: 20),

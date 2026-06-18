@@ -566,7 +566,7 @@ class _GlassBubblePainter extends CustomPainter {
 
     Path strokeShapePath = shapePath;
     if (showTail && tailPathForStroke != null) {
-      final Path extrasOuter = Path.combine(PathOperation.difference, tailPathForStroke!, cloudPath);
+      final Path extrasOuter = Path.combine(PathOperation.difference, tailPathForStroke, cloudPath);
       strokeShapePath = Path.combine(PathOperation.union, cloudPath, extrasOuter);
     }
 

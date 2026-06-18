@@ -9,8 +9,7 @@ abstract class Failure extends Equatable {
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure([String message = 'Ошибка соединения с сервером'])
-      : super(message);
+  const NetworkFailure([super.message = 'Ошибка соединения с сервером']);
 }
 
 class ServerFailure extends Failure {
@@ -23,34 +22,31 @@ class ServerFailure extends Failure {
 }
 
 class AuthFailure extends Failure {
-  const AuthFailure([String message = 'Ошибка авторизации']) : super(message);
+  const AuthFailure([super.message = 'Ошибка авторизации']);
 }
 
 class InvalidCredentialsFailure extends Failure {
   const InvalidCredentialsFailure(
-      [String message = 'Неверный логин или пароль'])
-      : super(message);
+      [super.message = 'Неверный логин или пароль']);
 }
 
 class UserAlreadyExistsFailure extends Failure {
   const UserAlreadyExistsFailure(
-      [String message = 'Пользователь уже существует'])
-      : super(message);
+      [super.message = 'Пользователь уже существует']);
 }
 
 class TokenExpiredFailure extends Failure {
-  const TokenExpiredFailure([String message = 'Сессия истекла']) : super(message);
+  const TokenExpiredFailure([super.message = 'Сессия истекла']);
 }
 
 class CacheFailure extends Failure {
-  const CacheFailure([String message = 'Ошибка кэша']) : super(message);
+  const CacheFailure([super.message = 'Ошибка кэша']);
 }
 
 class ValidationFailure extends Failure {
-  const ValidationFailure(String message) : super(message);
+  const ValidationFailure(super.message);
 }
 
 class UnknownFailure extends Failure {
-  const UnknownFailure([String message = 'Что-то пошло не так'])
-      : super(message);
+  const UnknownFailure([super.message = 'Что-то пошло не так']);
 }
